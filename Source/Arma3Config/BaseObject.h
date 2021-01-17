@@ -4,9 +4,10 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "GameFramework/Actor.h"
-#include "Shops/ClothingShop.h"
 
 #include "BaseObject.generated.h"
+
+class UClothingShop;
 
 USTRUCT(BlueprintType)
 struct FBaseStruct
@@ -16,32 +17,32 @@ public:
 
 	FBaseStruct();
 	virtual	 ~FBaseStruct();
-	const FString Quote() const
+	static  FString Quote()
 	{
 		return "\"";
 	}
-	const FString NewLine() const
+	static  FString NewLine()
 	{
 		return "\n";
 	}
-	const FString Comma() const
+	static  FString Comma()
 	{
 		return ", ";
 	}
-	const FString Tab() const
+	static  FString Tab()
 	{
 		return "	";
 	}
-	const FString OpenBrakets(const int tabCount) const;
-	const FString ClosedBraketsComma(const int tabCount) const;
-	const FString ClosedBrakets(const int tabCount) const;
-	const FString ClosedBraketSemiColon(const int tabCount) const;
-	const FString ContainerOpen(const int tabCount) const;
-	virtual const FString MakeString(const bool isEndString) const;
-	const FString ClassName() const;
-	const FString VariableName() const;
-	const FString DisplayName() const;
-	const FString Conditions() const;
+	static  FString OpenBrakets(int tabCount);
+	static  FString ClosedBraketsComma(int tabCount);
+	static  FString ClosedBrakets(int tabCount);
+	static 	 FString ClosedBraketSemiColon(int tabCount);
+	static  FString ContainerOpen(int tabCount);
+	virtual  FString MakeString(bool isEndString);
+	static 	 FString ClassName();
+	static  FString VariableName();
+	static  FString DisplayName();
+	static  FString Conditions();
 
 	//Class Name only used if this object will be a class
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "bDisplayClassName"))
@@ -61,13 +62,13 @@ public:
 
 protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	bool bDisplayClassName = false;
+		bool bDisplayClassName = false;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	bool bDisplayVariableName = false;
+		bool bDisplayVariableName = false;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	bool bDisplayDisplayName = false;
+		bool bDisplayDisplayName = false;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	bool bDisplayConditions = false;
+		bool bDisplayConditions = false;
 };
 
 USTRUCT(BlueprintType)
@@ -75,9 +76,9 @@ struct FItemBase : public FBaseStruct
 {
 	GENERATED_BODY()
 public:
-	virtual const FString MakeString(const bool isEndString) const override;
-	const FString BuyPrice() const;
-	const FString SellPrice() const;
+	virtual  FString MakeString(bool isEndString) override;
+	static FString BuyPrice();
+	static FString SellPrice();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "bDisplayBuyPrice"))
 		int _BuyPrice = -1;
@@ -96,7 +97,7 @@ struct FClothingItem : public FItemBase
 public:
 	FClothingItem();
 
-	virtual const FString MakeString(const bool isEndString) const override;
+	virtual  FString MakeString(bool isEndString) override;
 };
 
 USTRUCT(BlueprintType)
@@ -104,13 +105,13 @@ struct FVirtualItem : public FBaseStruct
 {
 	GENERATED_BODY()
 public:
-	virtual const FString MakeString(const bool isEndString) const override;
-	const FString Weight() const;
+	virtual  FString MakeString(bool isEndString) override;
 
-	const  FString Illegal() const;
-	const  FString Edible() const;
-	const FString Drinkable() const;
-	const  FString Icon() const;
+	static FString Weight();
+	static FString Illegal();
+	static FString Edible();
+	static FString Drinkable();
+	static FString Icon();
 
 	//Item Weight
 	int _Weight = -1;
@@ -130,151 +131,114 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct FContainer : public FBaseStruct
+struct FContainer
 {
 	GENERATED_BODY()
 public:
 	FContainer();
 	FContainer(FName name);
-
-	const FString MakeString(const bool isEndString) const override;
-
-
+	FName _ContainerName = "Name";
+	FString MakeString(bool isEndString);
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		TArray<FItemBase> _ContainerItems;
-
-};
-
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class UShopBase : public UActorComponent
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FName _ShopName;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray<FContainer> _Containers;
-};
-
-UCLASS(BlueprintType)
-class AShopRepresentation : public AActor
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FName _ShopName;
-};
-
-UCLASS(BlueprintType)
-class AClothingShopNPC : public AShopRepresentation
-{
-	GENERATED_BODY()
-public:
-	AClothingShopNPC();
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UClothingShop* _ClothingShop;
-};
-
-
-
-USTRUCT(BlueprintType)
-struct FConfigWeaponShops : public FBaseStruct
-{
-	GENERATED_BODY()
-public:
-	const FString MakeString(const bool isEndString) const override;
 };
 
 USTRUCT(BlueprintType)
-struct FConfigVirtualItems : public FBaseStruct
+struct FConfigBase
 {
 	GENERATED_BODY()
 public:
-	const FString MakeString(const bool isEndString) const override;
+	virtual	 ~FConfigBase();
+	virtual FString MakeString();
 };
 
 USTRUCT(BlueprintType)
-struct FConfigVehicles : public FBaseStruct
+struct FConfigWeaponShops : public FConfigBase
 {
 	GENERATED_BODY()
-public:
-	const FString MakeString(const bool isEndString) const override;
 };
 
 USTRUCT(BlueprintType)
-struct FConfigSpawnPoints : public FBaseStruct
+struct FConfigVirtualItems : public FConfigBase
 {
 	GENERATED_BODY()
-public:
-	const FString MakeString(const bool isEndString) const override;
+
 };
 
 USTRUCT(BlueprintType)
-struct FConfigProcess : public FBaseStruct
+struct FConfigVehicles : public FConfigBase
 {
 	GENERATED_BODY()
-public:
-	const FString MakeString(const bool isEndString) const override;
+
 };
 
 USTRUCT(BlueprintType)
-struct FConfigLoadouts : public FBaseStruct
+struct FConfigSpawnPoints : public FConfigBase
 {
 	GENERATED_BODY()
-public:
-	const FString MakeString(const bool isEndString) const override;;
+
 };
 
 USTRUCT(BlueprintType)
-struct FConfigLicenses : public FBaseStruct
+struct FConfigProcess : public FConfigBase
 {
 	GENERATED_BODY()
-public:
-	const FString MakeString(const bool isEndString) const override;
+
 };
 
 USTRUCT(BlueprintType)
-struct FConfigHousing : public FBaseStruct
+struct FConfigLoadouts : public FConfigBase
 {
 	GENERATED_BODY()
-public:
-	const FString MakeString(const bool isEndString) const override;
+
 };
 
 USTRUCT(BlueprintType)
-struct FConfigGather : public FBaseStruct
+struct FConfigLicenses : public FConfigBase
 {
 	GENERATED_BODY()
-public:
-	const FString MakeString(const bool isEndString) const override;
+
 };
 
 USTRUCT(BlueprintType)
-struct FConfigGarages : public FBaseStruct
+struct FConfigHousing : public FConfigBase
 {
 	GENERATED_BODY()
-public:
-	const FString MakeString(const bool isEndString) const override;
+
 };
 
 USTRUCT(BlueprintType)
-struct FConfigClothing : public FBaseStruct
+struct FConfigGather : public FConfigBase
+{
+	GENERATED_BODY()
+
+};
+
+USTRUCT(BlueprintType)
+struct FConfigGarages : public FConfigBase
+{
+	GENERATED_BODY()
+
+};
+
+USTRUCT(BlueprintType) 
+struct FConfigClothing : public FConfigBase
 {
 	GENERATED_BODY()
 public:
 	FConfigClothing();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<UClothingShop*> _ClothingShops;
-	const FString MakeString(const bool isEndString) const override;
+	FString MakeString() override;
 
 };
 
 UCLASS()
-class ARMA3CONFIG_API UBaseObject : public UDataAsset
+class ARMA3CONFIG_API UConfigMaker : public UDataAsset
 {
 	GENERATED_BODY()
 public:
-	UBaseObject();
+	UConfigMaker();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FConfigWeaponShops _ConfigWeaponShop;
 

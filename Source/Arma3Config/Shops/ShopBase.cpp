@@ -1,27 +1,23 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Shops/ClothingShop.h"
+#include "ShopBase.h"
 
 // Sets default values for this component's properties
-UClothingShop::UClothingShop()
+UShopBase::UShopBase()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
+	TArray<FContainer> _Containers;
 
-	_Containers.Emplace(FContainer("uniforms"));
-	_Containers.Emplace(FContainer("headgear"));
-	_Containers.Emplace(FContainer("goggles"));
-	_Containers.Emplace(FContainer("vests"));
-	_Containers.Emplace(FContainer("backpacks"));
 }
 
 
 // Called when the game starts
-void UClothingShop::BeginPlay()
+void UShopBase::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -31,7 +27,7 @@ void UClothingShop::BeginPlay()
 
 
 // Called every frame
-void UClothingShop::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UShopBase::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 

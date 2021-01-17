@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "../BaseObject.h"
+#include "ShopBase.h"
 #include "ClothingShop.generated.h"
 
 
@@ -17,6 +17,7 @@ public:
 	// Sets default values for this component's properties
 	UClothingShop();
 
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -24,6 +25,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	const FString MakeString(const bool isEndString) const override;
+	 FString MakeString( bool isEndString) ;
 		
 };

@@ -1,4 +1,0 @@
-﻿  ConfigTest.cpp
-C:\Users\Kieran Grist\source\repos\ConfigTest\ConfigTest\ConfigTest.cpp(101,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Kieran Grist\source\repos\ConfigTest\ConfigTest\ConfigTest.cpp(151,21): warning C4018: '<': signed/unsigned mismatch
-  ConfigTest.vcxproj -> C:\Users\Kieran Grist\source\repos\ConfigTest\Debug\ConfigTest.exe

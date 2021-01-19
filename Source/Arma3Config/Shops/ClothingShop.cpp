@@ -15,24 +15,18 @@ UClothingShop::UClothingShop()
 	_Containers.Emplace(FContainer("goggles"));
 	_Containers.Emplace(FContainer("vests"));
 	_Containers.Emplace(FContainer("backpacks"));
+
+	 bDisplplayShopName = true;
+	 bDisplaySide = true;
+	 bDisplayConditions = true;
 }
 
-
-// Called when the game starts
 void UClothingShop::BeginPlay()
 {
-	Super::BeginPlay();
 
-	// ...
-	
 }
 
-
-// Called every frame
 void UClothingShop::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
 }
-

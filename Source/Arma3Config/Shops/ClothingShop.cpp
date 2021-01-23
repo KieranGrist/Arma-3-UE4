@@ -1,32 +1,40 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "ClothingShop.h"
-
+#include "../Items/Public/ClothingItem.h"
 
 
 // Sets default values for this component's properties
 UClothingShop::UClothingShop()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
 	_ShopName = "ClothingShop";
-	_Containers.Emplace(FContainer("uniforms"));
-	_Containers.Emplace(FContainer("headgear"));
-	_Containers.Emplace(FContainer("goggles"));
-	_Containers.Emplace(FContainer("vests"));
-	_Containers.Emplace(FContainer("backpacks"));
-
-	 bDisplplayShopName = true;
-	 bDisplaySide = true;
-	 bDisplayConditions = true;
+	_Containers.Emplace(FClothingShopContainer("uniforms"));
+	_Containers.Emplace(FClothingShopContainer("headgear"));
+	_Containers.Emplace(FClothingShopContainer("goggles"));
+	_Containers.Emplace(FClothingShopContainer("vests"));
+	_Containers.Emplace(FClothingShopContainer("backpacks"));
 }
 
-void UClothingShop::BeginPlay()
+FClothingShopContainer::FClothingShopContainer()
 {
 
 }
 
-void UClothingShop::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+FClothingShopContainer::FClothingShopContainer(FName name)
 {
+	_ContainerName = name;
+}
 
+FString FClothingShopContainer::MakeString()
+{
+	FString containerString = "";
+	for (int i = 0; i < _ContainerItems.Num(); i++)
+	{
+		containerString += _ContainerItems[i]->MakeString(i == _ContainerItems.Num() - 1);
+	}
+	return _ContainerName.ToString() + UItemBase::ContainerOpen(2) + containerString + UItemBase::ClosedBraketSemiColon(2);
+}
+
+void FClothingShopContainer::UpdateConfigText()
+{
+	_ConfigText = MakeString();
 }

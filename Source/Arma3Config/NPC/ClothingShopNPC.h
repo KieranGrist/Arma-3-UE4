@@ -19,4 +19,10 @@ public:
 	AClothingShopNPC();
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Clothing Shop")
 		UClothingShop* _ClothingShop;
+
+	UFUNCTION(CallInEditor)
+		void UpdateConfigText();
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+		FString _ConfigText = "";
 };

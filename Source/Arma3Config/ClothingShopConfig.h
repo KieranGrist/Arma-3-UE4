@@ -3,18 +3,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Items/ItemBase.h"
+
 #include "Shops/ClothingShop.h"
+#include "Items/Public/ItemBase.h"
 #include "ClothingShopConfig.generated.h"
 
 UCLASS(hidecategories = Object, BlueprintType)
 class ARMA3CONFIG_API UClothingShopConfig : public UItemBase
 {
 	GENERATED_BODY()
-	public:
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FName _ClassName;
 
-		UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Shop")
-	TArray<UClothingShop*> _ClothingShops;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		TArray<UClothingShop*> _ClothingShops;
 
-		FString MakeString(bool isEndString = false);
+	FString MakeString(bool isEndString = false);
 };

@@ -7,3 +7,8 @@ AClothingShopNPC::AClothingShopNPC()
 {
 	_ClothingShop = CreateDefaultSubobject<UClothingShop>(TEXT("ClothingShop"));
 }
+
+void AClothingShopNPC::UpdateConfigText()
+{
+	_ConfigText = _ClothingShop->MakeString();
+}

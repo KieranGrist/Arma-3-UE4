@@ -7,8 +7,34 @@
 #include "ShopBase.h"
 #include "ClothingShop.generated.h"
 
+class UClothingItem;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+USTRUCT(BlueprintType)
+struct FClothingShopContainer
+{
+	GENERATED_BODY()
+public:
+	FClothingShopContainer();
+	FClothingShopContainer(FName name);
+	FString MakeString();
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Container")
+		TArray<UClothingItem*> _ContainerItems;
+
+	void UpdateConfigText();
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Container")
+		FString _ConfigText = "";
+protected:
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Container")
+		FName _ContainerName = "Name";
+};
+
+
+
+
+
+UCLASS(hidecategories = Object, BlueprintType)
 class ARMA3CONFIG_API UClothingShop : public UShopBase
 {
 	GENERATED_BODY()
@@ -16,13 +42,7 @@ class ARMA3CONFIG_API UClothingShop : public UShopBase
 public:	
 	// Sets default values for this component's properties
 	UClothingShop();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-		
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Shop")
+		TArray<FClothingShopContainer> _Containers;
 };

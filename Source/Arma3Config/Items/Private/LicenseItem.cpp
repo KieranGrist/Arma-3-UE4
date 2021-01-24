@@ -11,38 +11,38 @@ FString ULicenseItem::MakeString()
 	ret += Price();
 	ret += LicenseIllegal();
 	ret += LicenseSide();
+	ret += ClosedBracketSemiColon(_ClassTabs);
 	return ret;
 }
 
 FString ULicenseItem::ClassName()
 {
-	return Tab() + "class " + _VariableName.ToString() + Tab() + NewLine() + OpenBrakets(1) + NewLine();
+	return ClassString(_VariableName.ToString(), _ClassTabs);
 }
 
 FString ULicenseItem::VariableName()
-{
-	return Tab() + "variable = " + Quote() + _VariableName.ToString() + Quote() + ClosedBraketSemiColon(0) + NewLine();
+{	
+	return ClassMember("variable", _ClassMembersTabs,_VariableName.ToString());
 }
 
 FString ULicenseItem::DisplayName()
 {
-	return Tab() + "displayName = " + Quote() + _DisplayName.ToString() + Quote() + ClosedBraketSemiColon(0) + NewLine();
+	return ClassMember("displayName", _ClassMembersTabs, _DisplayName.ToString());
 }
 
 FString ULicenseItem::Price()
 {
-	return Tab() + "price =" + FString::FromInt(_Price) + ClosedBraketSemiColon(0) + NewLine();
+	return ClassMember("price", _ClassMembersTabs, _Price);
 }
 
 FString ULicenseItem::LicenseIllegal()
 {
-	return Tab() + "illegal =" + BoolToString(_LicenseIllegal) + ClosedBraketSemiColon(0) + NewLine();
+	return ClassMember("illegal", _ClassMembersTabs, _LicenseIllegal);
 }
 
 FString ULicenseItem::LicenseSide()
 {
-
-	return Tab() + "side =" + Side(_LicenseSide) + ClosedBraketSemiColon(0) + NewLine() + ClosedBraketSemiColon(1);
+	return ClassMember("side", _ClassMembersTabs, _LicenseSide);
 }
 
 void ULicenseItem::UpdateConfigText()

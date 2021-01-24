@@ -63,7 +63,7 @@ public:
 
 	//garageBlacklists[] - List of blacklisted houses for buying garages
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray<FVector>_GarageBlacklists;
+		TArray<FVector>_GarageBlacklist;
 	//WorldToModel position for the light
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		FVector _LightPosition;

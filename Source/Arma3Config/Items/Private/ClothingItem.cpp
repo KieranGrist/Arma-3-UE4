@@ -3,32 +3,34 @@
 FString UClothingItem::MakeString(bool isEndString)
 {
 	FString ret;
-	ret += OpenBrakets(0);
+	ret += OpenBrackets();
 	ret += ClassName();
 	ret += DisplayName();
 	ret += Price();
-	ret += Conditions() +  ClosedBrakets(0) +  Comma(isEndString);
+	ret += Conditions();
+	ret += ClosedBrackets(); 
+	ret += Comma(isEndString);
 	return ret;
 }
 
 FString UClothingItem::ClassName()
-{
-	return Quote() + _ClassName.ToString() + Quote() + Comma(true);
+{  
+	return LineClassName(_ClassName.ToString());
 }
 
 FString UClothingItem::DisplayName()
 {
-	return Quote() + _DisplayName + Quote() + Comma(true);
+return LineMember(_DisplayName,true);
 }
 
 FString UClothingItem::Conditions()
 {
-	return Quote() + _Conditions + Quote();
+	return LineMember(_Conditions, false);
 }
 
 FString UClothingItem::Price()
 {
-	return FString::FromInt(_Price) + Comma(true);
+	return LineMember(_Price, true);
 }
 
 void UClothingItem::UpdateConfigText()

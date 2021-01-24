@@ -23,6 +23,9 @@ public:
 	FString NoLicenseCost();
 	FString MakeString(bool isEndString);
 
+	static FString VirtualPairToString(TPair<UVirtualItem*, int> pair, bool useComma);
+	static FString VirtualMapToString(FString name, int classMemberTabs, TMap<UVirtualItem*, int> virtualItemMap);
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FString _ClassName;
 
@@ -33,9 +36,9 @@ public:
 	//MaterialsGive (Returned items) = Array - Format -> {{"ITEM CLASS",HOWMANY}}
 	TPair<UVirtualItem*, int> _MaterialsGiven;
 
+
 	//Text(Progress Bar Text)
 	FString _ProgressBarText;
-
 	// NoLicenseCost (Cost to process w/o license)
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		int _NoLicenseCost = 30;

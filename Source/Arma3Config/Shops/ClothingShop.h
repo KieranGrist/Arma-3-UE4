@@ -3,46 +3,59 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
-#include "ShopBase.h"
+#include "../Items/Public/ItemBase.h"
+
 #include "ClothingShop.generated.h"
 
 class UClothingItem;
 
-USTRUCT(BlueprintType)
-struct FClothingShopContainer
-{
-	GENERATED_BODY()
-public:
-	FClothingShopContainer();
-	FClothingShopContainer(FName name);
-	FString MakeString();
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Container")
-		TArray<UClothingItem*> _ContainerItems;
-
-	void UpdateConfigText();
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Container")
-		FString _ConfigText = "";
-protected:
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Container")
-		FName _ContainerName = "Name";
-};
-
-
-
-
-
-UCLASS(hidecategories = Object, BlueprintType)
-class ARMA3CONFIG_API UClothingShop : public UShopBase
+UCLASS(BlueprintType)
+class ARMA3CONFIG_API UClothingShop : public UItemBase
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
 	UClothingShop();
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Shop")
-		TArray<FClothingShopContainer> _Containers;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	FName _ShopName;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	FString _Conditions;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		FSide _ShopSide = FSide::civ;
+
+		UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UClothingItem* _Uniforms;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UClothingItem* _Headgear;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UClothingItem* _Goggles;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UClothingItem* _Vests;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UClothingItem* _Backpacks;
+
+	FString  ShopName();
+		FString Conditions();
+		FString Side();
+		FString Uniforms();
+		FString Headgear();
+		FString Goggles();
+		FString Vests();
+		FString Backpacks();
+
+	FString MakeString();
+
+	UFUNCTION(CallInEditor)
+		void UpdateConfigText();
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+		FString _ConfigText = "";
 };

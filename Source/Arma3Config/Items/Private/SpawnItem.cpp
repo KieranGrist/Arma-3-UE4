@@ -1,27 +1,27 @@
 #include "..\Public\SpawnItem.h"
 FString USpawnItem::ClassName()
 {
-	return Tab() + "class " + _ClassName + OpenBrakets(1) + NewLine();
+	return ClassString(_ClassName, _ClassTabs);
 }
 
 FString USpawnItem::DisplayName()
 {
-	return Tab() + "displayName = " + Quote() + _DisplayName + Quote() + ClosedBrakets(0);
+	return ClassMember("displayName", _ClassMembersTabs, _DisplayName);
 }
 
 FString USpawnItem::SpawnMarker()
 {
-	return Tab() + "spawnMarker = " + Quote() + _SpawnMarker + Quote() + ClosedBrakets(0);
+	return ClassMember("spawnMarker", _ClassMembersTabs, _SpawnMarker);
 }
 
 FString USpawnItem::Icon()
 {
-	return Tab() + "icon = " + Quote() + _Icon + Quote() + ClosedBrakets(0);
+	return ClassMember("icon", _ClassMembersTabs, _Icon);
 }
 
 FString USpawnItem::Conditions()
 {
-	return Tab() + "conditions = " + Quote() + _Conditions + Quote() + ClosedBrakets(0) + NewLine() + ClosedBraketSemiColon(1);
+	return ClassMember("conditions", _ClassMembersTabs, _Conditions);
 }
 
 FString USpawnItem::MakeString()
@@ -32,6 +32,7 @@ FString USpawnItem::MakeString()
 	ret += SpawnMarker();
 	ret += Icon();
 	ret += Conditions();
+	ret += ClosedBracketSemiColon(_ClassTabs);
 	return ret;
 }
 

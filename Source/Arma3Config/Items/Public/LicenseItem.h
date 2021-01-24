@@ -35,7 +35,7 @@ public:
 	//illegal = Illegal Item
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		bool _LicenseIllegal = false;
-	//edible = Item Edible(-1 = Disabled, other values = added value)
+	//Side of the License
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		FSide _LicenseSide = FSide::civ;
 

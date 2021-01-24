@@ -16,67 +16,63 @@ FString UVirtualItem::MakeString()
 	ret += ItemDrinkable();
 	ret += ItemIcon();
 	ret += ProcessedItem();
+	ret += ClosedBracketSemiColon(_ClassTabs);
 	return ret;
 }
 
 FString UVirtualItem::ClassName()
 {
-	return Tab() + "class " + _VariableName.ToString() + Tab() + NewLine() + OpenBrakets(1) + NewLine();
+	return ClassString(_VariableName.ToString(), _ClassTabs);
 }
 
 FString UVirtualItem::VariableName()
 {
-	return Tab() + "variable = " + Quote() + _VariableName.ToString() + Quote() + SemiColon(0) + NewLine();
+	return ClassMember("variable", _ClassMembersTabs, _VariableName.ToString());
 }
 
 FString UVirtualItem::DisplayName()
 {
-	return Tab() + "displayName = " + Quote() + _DisplayName.ToString() + Quote() + SemiColon(0) + NewLine();
+	return ClassMember("displayName", _ClassMembersTabs, _DisplayName.ToString());
 }
 
 FString UVirtualItem::ItemWeight()
 {
-	return "weight =" + FString::FromInt(_ItemWeight) + SemiColon(0) + NewLine();
+	return ClassMember("weight", _ClassMembersTabs, _ItemWeight);
 }
 
 FString UVirtualItem::BuyPrice()
 {
-	return "buyPrice =" + FString::FromInt(_BuyPrice) + SemiColon(0) + NewLine();
+	return ClassMember("buyPrice", _ClassMembersTabs, _BuyPrice);
 }
 
 FString UVirtualItem::SellPrice()
 {
-	return "sellPrice =" + FString::FromInt(_SellPrice) + SemiColon(0) + NewLine();
+	return ClassMember("sellPrice", _ClassMembersTabs, _SellPrice);
 }
 
 FString UVirtualItem::ItemIllegal()
 {
-	return "illegal =" + _ItemIllegal + SemiColon(0) + NewLine();
+	return ClassMember("illegal", _ClassMembersTabs, _ItemIllegal);
 }
 
 FString UVirtualItem::ItemEdible()
 {
-	return "edible =" + FString::FromInt(_ItemEdible) + SemiColon(0) + NewLine();
+	return ClassMember("edible", _ClassMembersTabs, _ItemEdible);
 }
 
 FString UVirtualItem::ItemDrinkable()
 {
-	return "drinkable =" + FString::FromInt(_ItemDrinkable) + SemiColon(0) + NewLine();
+	return ClassMember("drinkable", _ClassMembersTabs, _ItemDrinkable);
 }
 
 FString UVirtualItem::ItemIcon()
 {
-	return "icon = " + Quote() + _ItemIcon + Quote() + SemiColon(0) + NewLine();
+	return ClassMember("icon", _ClassMembersTabs, _ItemIcon);
 }
 
 FString UVirtualItem::ProcessedItem()
 {
-	FString ret = "processedItem =";
-	if (_ProcessedItem)
-	{
-		ret += Quote() + _ProcessedItem->_VariableName.ToString() + Quote();
-	}
-	return ret + NewLine() + ClosedBraketSemiColon(1);
+	return ClassMember("processedItem", _ClassMembersTabs, _ProcessedItem);
 }
 
 void UVirtualItem::UpdateConfigText()

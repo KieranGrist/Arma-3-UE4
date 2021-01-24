@@ -42,7 +42,7 @@ public:
 
 	//garageBlacklists[] - List of blacklisted houses for buying garages
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray<FVector>_GarageBlacklists;
+		TArray<FVector>_GarageBlacklist;
 
 	UFUNCTION(CallInEditor)
 		void UpdateConfigText();

@@ -19,5 +19,5 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		TArray<UClothingShop*> _ClothingShops;
 
-	FString MakeString(bool isEndString = false);
+	FString MakeString();
 };

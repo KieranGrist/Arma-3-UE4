@@ -3,39 +3,39 @@
 FString UWeaponItem::MakeString(bool isEndString)
 {
 	FString ret;
-	ret += OpenBrakets(2);
-		ret += ClassName();
-		ret += NickName();
-		ret += BuyPrice();
-		ret += SellPrice();
-		ret += Conditions();
-		ret += ClosedBrakets(0) + Comma(isEndString);
-		return ret;
+	ret += OpenBrackets(2);
+	ret += ClassName();
+	ret += NickName();
+	ret += BuyPrice();
+	ret += SellPrice();
+	ret += Conditions();
+	ret += ClosedBrackets() + Comma(isEndString);
+	return ret;
 }
 
 FString UWeaponItem::ClassName()
 {
-	return Tab() + Quote() + _ClassName.ToString() + Quote() + Comma(true);
+	return LineClassName(_ClassName.ToString());
 }
 
 FString UWeaponItem::NickName()
 {
-	return Quote() + _NickName + Quote() + Comma(true) ;
+	return LineMember(_NickName, true);
 }
 
 FString UWeaponItem::BuyPrice()
 {
-	return FString::FromInt(_BuyPrice) + Comma(true);
+	return LineMember(_BuyPrice, true);
 }
 
 FString UWeaponItem::SellPrice()
 {
-	return FString::FromInt(_SellPrice) + Comma(true);
+	return LineMember(_SellPrice, true);
 }
 
 FString UWeaponItem::Conditions()
 {
-	return Quote() + _Conditions + Quote() + Comma(true);
+	return LineMember(_Conditions, false);
 }
 
 

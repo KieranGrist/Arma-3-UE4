@@ -3,41 +3,27 @@
 
 FString UResoruceItem::ClassName()
 {
-	return Tab() + "class " + _ItemGathered->_VariableName.ToString() + Tab() + NewLine() + OpenBrakets(1) + NewLine();
+	return ClassString(_ItemGathered->_VariableName.ToString(), _ClassTabs);
 }
 
 FString UResoruceItem::Amount()
 {
-	return Tab() + "amount = " + FString::FromInt(_Amount) + ClosedBrakets(0) + NewLine();
+	return ClassMember("amount", _ClassMembersTabs, _Amount);
 }
 
 FString UResoruceItem::Zones()
 {
-	FString ret = "zones[] = {";
-	int index =0;
-	for (const auto zone : _Zones)
-	{
-		ret += Quote() + zone + Quote() + Comma(index < _Zones.Num());
-		index++;
-	}
-	ret += ClosedBraketSemiColon(0);
-	return ret;
+	return ClassContainerMember("zones", _ClassMembersTabs, _Zones);
 }
 
 FString UResoruceItem::Item()
 {
-	FString ret = Tab() + "item = " + Quote();
-	if (_Item)
-	{
-		ret += _Item->_VariableName.ToString();
-	}
-	ret += Quote() + ";";
-	return ret;
+	return ClassMember("item", _ClassMembersTabs, _Item);
 }
 
 FString UResoruceItem::ZoneSize()
 {
-	return Tab() + "zoneSize = " + FString::FromInt(_ZoneSize) + SemiColon(0) + NewLine() + ClosedBraketSemiColon(1);
+	return ClassMember("zoneSize", _ClassMembersTabs, _ZoneSize);
 }
 
 FString UResoruceItem::MakeString(bool isEndString)
@@ -52,6 +38,7 @@ FString UResoruceItem::MakeString(bool isEndString)
 	ret += Zones();
 	ret += Item();
 	ret += ZoneSize();
+	ret += ClosedBracketSemiColon(_ClassTabs);
 	return ret;
 }
 

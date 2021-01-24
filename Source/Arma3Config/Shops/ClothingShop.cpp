@@ -2,39 +2,52 @@
 #include "ClothingShop.h"
 #include "../Items/Public/ClothingItem.h"
 
-
-// Sets default values for this component's properties
-UClothingShop::UClothingShop()
+FString UClothingShop::ShopName()
 {
-	_ShopName = "ClothingShop";
-	_Containers.Emplace(FClothingShopContainer("uniforms"));
-	_Containers.Emplace(FClothingShopContainer("headgear"));
-	_Containers.Emplace(FClothingShopContainer("goggles"));
-	_Containers.Emplace(FClothingShopContainer("vests"));
-	_Containers.Emplace(FClothingShopContainer("backpacks"));
+	return ClassString(_ShopName.ToString(), _ClassTabs);
 }
 
-FClothingShopContainer::FClothingShopContainer()
+FString UClothingShop::Conditions()
 {
-
+	return ClassMember("conditions", _ClassMembersTabs, _Conditions);
 }
 
-FClothingShopContainer::FClothingShopContainer(FName name)
+FString UClothingShop::Side()
 {
-	_ContainerName = name;
+	return FString();
 }
 
-FString FClothingShopContainer::MakeString()
+FString UClothingShop::Uniforms()
 {
-	FString containerString = "";
-	for (int i = 0; i < _ContainerItems.Num(); i++)
-	{
-		containerString += _ContainerItems[i]->MakeString(i == _ContainerItems.Num() - 1);
-	}
-	return _ContainerName.ToString() + UItemBase::ContainerOpen(2) + containerString + UItemBase::ClosedBraketSemiColon(2);
+	return FString();
 }
 
-void FClothingShopContainer::UpdateConfigText()
+FString UClothingShop::Headgear()
 {
-	_ConfigText = MakeString();
+	return FString();
+}
+
+FString UClothingShop::Goggles()
+{
+	return FString();
+}
+
+FString UClothingShop::Vests()
+{
+	return FString();
+}
+
+FString UClothingShop::Backpacks()
+{
+	return FString();
+}
+
+FString UClothingShop::MakeString()
+{
+	return FString();
+}
+
+void UClothingShop::UpdateConfigText()
+{
+
 }

@@ -3,39 +3,28 @@
 
 FString UProcessItem::ClassName()
 {
-	return Tab() + "class " + _ClassName + Tab() + NewLine() + OpenBrakets(1) + NewLine();
+	return ClassString(_ClassName, _ClassTabs);
 }
 
 FString UProcessItem::MaterialsRequired()
 {
-	FString ret = Tab() + "MaterialsReq[] = {";
-	int mapCount = _MaterialsRequired.Num();
-	int index = 0;
-	for (auto& Elem : _MaterialsRequired)
-	{	
-		ret += OpenBrakets(0) + Quote() + Elem.Key->_VariableName.ToString() + Quote() + Comma(true) + FString::FromInt(Elem.Value) + ClosedBrakets(0) + Comma(index < mapCount);
-		index++;
-	}
-	ret += ClosedBraketSemiColon(0) + NewLine();
-	return ret;
+	return VirtualMapToString("MaterialsReq", _ClassMembersTabs, _MaterialsRequired);;
 }
 
 FString UProcessItem::MaterialsGiven()
-{
-	FString ret = Tab() + "MaterialsGive[] = {";
-	ret += OpenBrakets(0) + Quote() + _MaterialsGiven.Key->_VariableName.ToString() + Quote() + Comma(true) + FString::FromInt(_MaterialsGiven.Value) + ClosedBrakets(0);
-	ret += ClosedBraketSemiColon(0) + NewLine();
-	return ret;
+{	
+	TArray<FString> materialsGiven = { VirtualPairToString(_MaterialsGiven, false) };
+	return ClassContainerMember("MaterialsGive", _ClassMembersTabs, materialsGiven);
 }
 
 FString UProcessItem::ProgressBarText()
 {
-	return Tab() + "Text = " + Quote() + _ProgressBarText + Quote() + SemiColon(0) + NewLine();
+	return ClassMember("Text", _ClassMembersTabs, _ProgressBarText);
 }
 
 FString UProcessItem::NoLicenseCost()
 {
-	return "NoLicenseCost = " + FString::FromInt(_NoLicenseCost) + ";" + NewLine() + ClosedBraketSemiColon(1);
+	return ClassMember("NoLicenseCost", _ClassMembersTabs, _NoLicenseCost);
 }
 
 FString UProcessItem::MakeString(bool isEndString)
@@ -50,6 +39,29 @@ FString UProcessItem::MakeString(bool isEndString)
 	ret += MaterialsGiven();
 	ret += ProgressBarText();
 	ret += NoLicenseCost();
+	ret += ClosedBracketSemiColon(_ClassTabs);
+	return ret;
+}
+
+FString UProcessItem::VirtualPairToString(TPair<UVirtualItem*, int> pair, bool useComma)
+{  
+	FString ret;
+	ret += LineClassName(pair.Key->_VariableName.ToString());
+	ret += LineMember(pair.Value, false);
+	ret += ClosedBrackets() + Comma(useComma);
+	return ret;
+}
+
+FString UProcessItem::VirtualMapToString(FString name, int classMemberTabs, TMap<UVirtualItem*, int> virtualItemMap)
+{
+	FString ret = Tab(classMemberTabs) + name + ContainerOpen();
+	int i = 0;
+	for (auto& Elem : virtualItemMap)
+	{
+		i++;
+		ret += VirtualPairToString(Elem, i < virtualItemMap.Num());
+	}
+	ret += ClosedBracketSemiColon() + NewLine();
 	return ret;
 }
 

@@ -1,63 +1,191 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "../Public/ItemBase.h"
+#include "../Public/VirtualItem.h"
 
-// Sets default values
-UItemBase::UItemBase()
+FString UItemBase::Quote()
 {
-
+	return "\"";
 }
 
-FString UItemBase::OpenBrakets(int tabCount)
+FString UItemBase::NewLine()
+{
+	return "\n";
+}
+
+FString UItemBase::Comma(bool useComma)
+{
+	if (!useComma)
+	{
+		return "";
+	}
+	return ", ";
+}
+
+FString UItemBase::Tab(int tabCount)
 {
 	FString tabs;
 	for (int i = 0; i < tabCount; i++)
 	{
-		tabs += Tab();
+		tabs += "	";
 	}
-	return tabs + "{ ";
+	return tabs;
 }
 
-FString UItemBase::ClosedBraketsComma(int tabCount)
+FString UItemBase::Side(FSide side)
 {
-	FString tabs;
-	for (int i = 0; i < tabCount; i++)
+	switch (side)
 	{
-		tabs += Tab();
+	case  FSide::civ:
+		return Quote() + "civ" + Quote();
+		break;
+	case FSide::cop:
+		return Quote() + "cop" + Quote();
+		break;
+	case  FSide::med:
+		return Quote() + "med" + Quote();
+		break;
 	}
-	return tabs + "},";
+	return "Error no side";
 }
 
-FString UItemBase::ClosedBrakets(int tabCount)
+FString UItemBase::BoolToString(bool inBool)
 {
-	FString tabs;
-	for (int i = 0; i < tabCount; i++)
-	{
-		tabs += Tab();
-	}
-	return tabs + "}";
+	return inBool ? "true" : "false";
 }
 
-FString UItemBase::ClosedBraketSemiColon(int tabCount)
+FString UItemBase::OpenBrackets(int tabCount)
 {
-	FString tabs;
-	for (int i = 0; i < tabCount; i++)
-	{
-		tabs += Tab();
-	}
-	return tabs + "};";
+	return Tab(tabCount) + "{ ";
+}
+
+FString UItemBase::ClosedBracketsComma(int tabCount )
+{
+
+	return Tab(tabCount) + "},";
+}
+
+FString UItemBase::ClosedBrackets(int tabCount)
+{
+	return Tab(tabCount) + "}";
+}
+
+FString UItemBase::ClosedBracketSemiColon(int tabCount)
+{
+	return Tab(tabCount) + "};";
 }
 
 FString UItemBase::SemiColon(int tabCount)
 {
-	FString tabs;
-	for (int i = 0; i < tabCount; i++)
-	{
-		tabs += Tab();
-	}
-	return tabs + ";";
+	return Tab(tabCount) + ";";
 }
 
-FString UItemBase::ContainerOpen(int tabCount)
+FString UItemBase::ContainerOpen()
 {
-	return "[] = " + NewLine() + OpenBrakets(tabCount);
+	return "[] = " + OpenBrackets();
+}
+
+//LineStringCreators
+FString UItemBase::LineClassName(FString className)
+{
+	return OpenBrackets(0) + LineMember(className, true);
+}
+
+FString UItemBase::LineMember(FString member, bool useComma)
+{
+	return Quote() + member + Quote() + Comma(useComma);
+}
+
+FString UItemBase::LineMember(int member, bool useComma)
+{
+	return FString::FromInt(member) + Comma(useComma);
+}
+
+FString UItemBase::LineMember(bool member, bool useComma)
+{
+	return BoolToString(member) + Comma(useComma);
+}
+
+FString UItemBase::LineSide(FSide member, bool useComma)
+{
+	return Side(member) + Comma(useComma);
+}
+
+//ClassStringCreators
+FString UItemBase::ClassString(FString name, int classTabs)
+{
+	return Tab(classTabs) + "class " + name + NewLine() + OpenBrackets(classTabs) + NewLine();
+}
+
+FString UItemBase::ClassMember(FString name, int classMemberTabs, int member)
+{
+	return Tab(classMemberTabs) + name + " = " + FString::FromInt(member) + SemiColon() + NewLine();
+}
+
+FString UItemBase::ClassMember(FString name, int classMemberTabs, bool member)
+{
+	return Tab(classMemberTabs) + name + " = " + BoolToString(member) + SemiColon() + NewLine();
+}
+
+FString UItemBase::ClassMember(FString name, int classMemberTabs, FSide member)
+{
+	return Tab(classMemberTabs) + name + " = " + Side(member) + SemiColon() + NewLine();
+}
+
+FString UItemBase::ClassMember(FString name, int classMemberTabs, FString member)
+{
+	return Tab(classMemberTabs) + name + " = " + LineMember(member, false) + SemiColon() + NewLine();
+}
+
+FString UItemBase::ClassMember(FString name, int classMemberTabs, FVector member)
+{
+	return Tab(classMemberTabs) + name + ContainerOpen() + member.ToString() + ClosedBrackets() + NewLine();
+}
+
+FString UItemBase::ClassMember(FString name, int classMemberTabs, UVirtualItem* member)
+{
+	return ClassMember("name", classMemberTabs, member ? member->_VariableName.ToString() : "");
+}
+
+FString UItemBase::ClassContainerMember(FString name, int classMemberTabs, TArray<FVector> vectors)
+{
+	FString ret = Tab(classMemberTabs) + name + ContainerOpen();
+	for (int i = 0; i < vectors.Num(); i++)
+	{
+		ret += "{" + vectors[i].ToString() + ClosedBrackets() + Comma(i < vectors.Num());
+	}
+	ret += ClosedBracketSemiColon() + NewLine();;
+	return ret;
+}
+
+FString UItemBase::ClassContainerMember(FString name, int classMemberTabs, TArray<int> intArray)
+{
+	FString ret = Tab(classMemberTabs) + name + ContainerOpen();
+	for (int i = 0; i < intArray.Num(); i++)
+	{
+		ret += FString::FromInt(intArray[i]) + Comma(i < intArray.Num());
+	}
+	ret += ClosedBracketSemiColon() + NewLine();
+	return ret;
+}
+
+FString UItemBase::ClassContainerMember(FString name, int classMemberTabs, TArray<FString> stringArray)
+{
+	FString ret = Tab(classMemberTabs) + name + ContainerOpen();
+	for (int i = 0; i < stringArray.Num(); i++)
+	{
+		ret += Quote() + stringArray[i] + Quote() + Comma(i < stringArray.Num());
+	}
+	ret += ClosedBracketSemiColon() + NewLine();
+	return ret;
+}
+
+FString UItemBase::ClassContainerMember(FString name, int classMemberTabs, TArray<UVirtualItem*> virtualItem)
+{
+	FString ret = Tab(classMemberTabs) + name + ContainerOpen();
+	for (int i = 0; i < virtualItem.Num(); i++)
+	{
+		ret += Quote() + virtualItem[i]->_VariableName.ToString() + Quote() + Comma(i < virtualItem.Num());;
+	}
+	ret += ClosedBracketSemiColon() + NewLine();
+	return ret;
 }

@@ -18,32 +18,25 @@ void UGarageItem::UpdateConfigText()
 
 FString UGarageItem::ClassName()
 {
-	return Tab() + "class " + _ClassName.ToString() + Tab() + NewLine() + OpenBrakets(1) + NewLine();
+	return ClassString(_ClassName.ToString(), _ClassTabs);
 }
 
 FString UGarageItem::Price()
 {
-	return Tab() + " price = " + FString::FromInt(_Price) + SemiColon(0) + NewLine();
+	return ClassMember("price", _ClassMembersTabs, _Price);
 }
 
 FString UGarageItem::GarageSpawnPosition()
 {
-	return Tab() + "garageSpawnPos[] = {" + _GarageSpawnPosition.ToString() + ClosedBraketSemiColon(0) + NewLine();
+	return ClassMember("garageSpawnPos", _ClassMembersTabs, _GarageSpawnPosition);
 }
 
 FString UGarageItem::GarageSpawnDirection()
 {
-	return Tab() + "garageSpawnDir =" + FString::FromInt(_GarageSpawnDirection) + SemiColon(0) + NewLine();
+	return ClassMember("garageSpawnDir", _ClassMembersTabs, _GarageSpawnDirection);
 }
 
 FString UGarageItem::GarageBlacklist()
 {
-
-	FString ret = Tab() + "garageBlacklists[] = {" + NewLine();
-	for (const auto garageBlacklist : _GarageBlacklists)
-	{
-		ret += "{" + garageBlacklist.ToString() + ClosedBraketsComma(0);
-	}
-	ret += NewLine() + ClosedBraketSemiColon(1);
-	return ret;
+	return 	ClassContainerMember("garageBlacklists", _ClassMembersTabs, _GarageBlacklist);
 }

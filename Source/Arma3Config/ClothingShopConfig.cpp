@@ -3,12 +3,12 @@
 
 #include "ClothingShopConfig.h"
 
-FString UClothingShopConfig::MakeString(bool isEndString)
+FString UClothingShopConfig::MakeString()
 {
 	FString shopsStrings;
 	for (int i = 0; i < _ClothingShops.Num(); i++)
 	{
 		shopsStrings += _ClothingShops[i]->MakeString();
 	}
-	return "class " + _ClassName.ToString() + UItemBase::NewLine() + UItemBase::OpenBrakets(0) + shopsStrings + UItemBase::ClosedBraketSemiColon(0);
+	return "class " + _ClassName.ToString() + UItemBase::NewLine() + UItemBase::OpenBrackets() + shopsStrings + UItemBase::ClosedBracketSemiColon();
 }

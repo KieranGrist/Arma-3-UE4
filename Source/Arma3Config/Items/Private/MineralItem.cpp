@@ -3,52 +3,31 @@
 
 FString UMineralItem::ClassName()
 {
-	return Tab() + "class " + _ClassName + Tab() + NewLine() + OpenBrakets(1) + NewLine();
+	return ClassString(_ClassName, _ClassTabs);
 }
 
 FString UMineralItem::Amount()
 {
-	return Tab() + "amount = " + FString::FromInt(_Amount) + SemiColon(1);
+	return ClassMember("amount", _ClassMembersTabs, _Amount);
 }
 
 FString UMineralItem::Zones()
 {
-	FString ret = Tab() + "zones[] = {";
-	int index =0;
-	for (const auto zone : _Zones)
-	{
-		ret += Quote() + zone + Quote() + Comma(index < _Zones.Num());
-		index++;
-	}
-	ret += ClosedBraketSemiColon(1);
-	return ret;
+	return ClassContainerMember("zones", _ClassMembersTabs, _Zones);
 }
 
 FString UMineralItem::Item()
 {
-	FString ret = Tab() + "item = " + Quote();
-	if (_Item)
-	{
-		ret += _Item->_VariableName.ToString();
-	}
-	ret += Quote() + ";" + NewLine();
-	return ret;
+	return ClassMember("item", _ClassMembersTabs, _Item);
 }
 
 FString UMineralItem::Mined()
 {
-	FString ret = Tab() + "mined[] = {";
-	for (const auto mined : _ItemMined)
-	{
-		ret += Quote() + mined->_VariableName.ToString() + Quote();
-	}
-	ret += ClosedBraketSemiColon(1);
-	return ret;
-}
-
+ return ClassContainerMember("mined", _ClassMembersTabs, _ItemMined);
+ }
 FString UMineralItem::ZoneSize()
 {
-	return Tab() +  "zoneSize = " + FString::FromInt(_ZoneSize) + ";" + NewLine() + SemiColon(0) + ClosedBraketSemiColon(1);
+	return ClassMember("zoneSize", _ClassMembersTabs, _ZoneSize);
 }
 
 FString UMineralItem::MakeString()
@@ -64,6 +43,7 @@ FString UMineralItem::MakeString()
 	ret += Item();
 	ret += Mined();
 	ret += ZoneSize();
+	ret += ClosedBracketSemiColon(_ClassTabs);
 	return ret;
 }
 

@@ -7,9 +7,10 @@ FString UConfigClothing::MakeString()
 	FString ret = ClassString("Clothing", _ClassTabs);
 	for (auto shop : _Shops)
 	{
+		shop->_ClassTabs = _ClassTabs + 1;
 		ret += shop->MakeString();
 	}
-	ret += ClosedBracketSemiColon();
+	ret += NewLine() + ClosedBracketSemiColon(_ClassTabs);
 	return ret;
 }
 

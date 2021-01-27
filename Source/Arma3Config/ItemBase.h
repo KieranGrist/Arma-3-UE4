@@ -64,8 +64,4 @@ public:
 	static FString ClassMember(FString name, int classMemberTabs, TMap<UVehicleItem*, FString>  vehicleItems);
 	static FString ClassMember(FString name, int classMemberTabs, TArray<UWeaponItem*> weaponItems);
 
-	UPROPERTY(EditAnywhere, Category = "Buxton Only")
-		int _ClassTabs = 2;
-	UPROPERTY(EditAnywhere, Category = "Buxton Only")
-		int _ClassMembersTabs = 3;
 };

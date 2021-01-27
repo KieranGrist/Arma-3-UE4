@@ -29,17 +29,17 @@ FString UClothingShop::Uniforms()
 
 FString UClothingShop::Headgear()
 {
-	return ClassMember("headgear", _ClassMembersTabs, _Uniforms);	return FString();
+	return ClassMember("headgear", _ClassMembersTabs, _Uniforms);	
 }
 
 FString UClothingShop::Goggles()
 {
-	return ClassMember("headgear", _ClassMembersTabs, _Uniforms);	return FString();
+	return ClassMember("headgear", _ClassMembersTabs, _Uniforms);	
 }
 
 FString UClothingShop::Vests()
 {
-	return ClassMember("headgear", _ClassMembersTabs, _Uniforms);	return FString();
+	return ClassMember("headgear", _ClassMembersTabs, _Uniforms);	
 }
 
 FString UClothingShop::Backpacks()
@@ -50,6 +50,7 @@ FString UClothingShop::Backpacks()
 FString UClothingShop::MakeString()
 {
 	FString ret;
+	_ClassMembersTabs = _ClassTabs + 1;
 	ret += ClassName();
 	ret += ShopName();
 	ret += Conditions();

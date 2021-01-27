@@ -26,4 +26,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 		FString _ConfigText = "";
+
+	int _ClassTabs = 0;
+	int _ClassMembersTabs = 1;
 };

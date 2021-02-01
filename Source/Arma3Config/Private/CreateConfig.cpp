@@ -12,7 +12,7 @@ void UCreateConfig::DataTableToUObjects()
 	for (const auto vItem : vItems)
 	{
 		FString packageName = _Path + vItem->_VariableName.ToString();
-		UPackage* package = CreatePackage(this, *packageName);
+		UPackage* package = CreatePackage(*packageName);
 
 
 		UItemBase* newAsset = NewObject<UItemBase>(package, vItem->_VariableName, flags);
@@ -114,11 +114,12 @@ void UCreateConfig::DataTableToQuickEditor()
 	{
 		if (virtualItem->_RowName.ToString().Contains(_SearchForRowsContaining.ToString()))
 		{
-			_VirtualItemsQuickEditor.Add(virtualItem->_RowName, -0);
+			_VirtualItemsQuickEditor.Add(virtualItem->_RowName, FContainer(virtualItem->_RowName));
 		}
 
-		if (virtualItem->_RowName.Compare(_SearchForRowsContaining))
+		if (virtualItem->_RowName.Compare(_SearchForRowsContaining) == 0)
 		{
+			_VirtualItemsQuickEditor.Remove(virtualItem->_RowName);
 			_ExactItem = *virtualItem;
 		}
 	}
@@ -130,9 +131,9 @@ void UCreateConfig::QuickEditorToDataTable()
 	{
 		FName rowName = virtualItem.Key;
 		auto rowItem = _VirtualItems->FindRow<FVirtualItem>(rowName, "UCreateConfig::QuickEditorToDataTable()", false);
-			_VirtualItems->RemoveRow(rowName);
-			rowItem->_SellPrice = (_ExactItem._SellPrice * virtualItem.Value[1]) * virtualItem.Value;
-			_VirtualItems->AddRow(virtualItem.Key, *rowItem);
+		rowItem->_SellPrice = (_ExactItem._SellPrice * virtualItem.Value._ContainerSize) * virtualItem.Value._Percentge;
+		rowItem->_ItemWeight = (_ExactItem._ItemWeight * virtualItem.Value._ContainerSize) + virtualItem.Value._Weight;
+	}
 }
 
 FString FClothingItem::MakeString()

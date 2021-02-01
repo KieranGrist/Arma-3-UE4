@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#pragma once
-
+#pragma 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Engine/DataTable.h"
@@ -19,7 +18,7 @@ enum class ESide : uint8
 USTRUCT(BlueprintType)
 struct FItem : public FTableRowBase
 {
-	GENERATED_USTRUCT_BODY() 
+	GENERATED_USTRUCT_BODY()
 public:
 
 	UPROPERTY(EditAnywhere)
@@ -32,7 +31,7 @@ public:
 USTRUCT(BlueprintType)
 struct FVirtualItem : public FItem
 {
-	GENERATED_USTRUCT_BODY() 
+	GENERATED_USTRUCT_BODY()
 public:
 	FString MakeString() override;
 
@@ -72,19 +71,19 @@ public:
 		FName _DisplayName;
 
 	//weight = Item Weight
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (Min = -1))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ClampMin = -1))
 		int _ItemWeight = -1;
 
 	//buyPrice = Item Buy Price
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (Min = -1))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ClampMin = -1))
 		int _BuyPrice = -1;
 
 	//sellPrice = Item Sell Price
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (Min = -1))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ClampMin = -1))
 		int _SellPrice = -1;
 
 	//Percentage to use when increase/decreasing the sell/buy price
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (Min = -1, Max = 100))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ClampMin = -1, ClampMax = 100))
 		int _Percentage = -1;
 
 	//illegal = Illegal Item
@@ -92,11 +91,11 @@ public:
 		bool _ItemIllegal = false;
 
 	//edible = Item Edible(-1 = Disabled, other values = added value)
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (Min = -1, Max = 100))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ClampMin = -1, ClampMax = 100))
 		int _ItemEdible = -1;
 
 	//drinkable = Item Drinkable(-1 = Disabled, other values = added value)
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (Min = -1, Max = 100))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ClampMin = -1, ClampMax = 100))
 		int _ItemDrinkable = -1;
 
 	//icon = Item Icon
@@ -120,7 +119,7 @@ FORCEINLINE uint32 GetTypeHash(const FVirtualItem& b)
 USTRUCT(BlueprintType)
 struct FClothingItem : public FItem
 {
-	GENERATED_USTRUCT_BODY() 
+	GENERATED_USTRUCT_BODY()
 public:
 	FString ClassName();
 
@@ -153,7 +152,7 @@ public:
 USTRUCT(BlueprintType)
 struct FGarageItem : public FItem
 {
-	GENERATED_USTRUCT_BODY() 
+	GENERATED_USTRUCT_BODY()
 public:
 	FString ClassName();
 
@@ -195,7 +194,7 @@ public:
 USTRUCT(BlueprintType)
 struct FHouseItem : public FItem
 {
-	GENERATED_USTRUCT_BODY() 
+	GENERATED_USTRUCT_BODY()
 public:
 	FString ClassName();
 
@@ -261,7 +260,7 @@ public:
 USTRUCT(BlueprintType)
 struct FLicenseItem : public FItem
 {
-	GENERATED_USTRUCT_BODY() 
+	GENERATED_USTRUCT_BODY()
 public:
 	FString MakeString()  override;
 
@@ -305,7 +304,7 @@ public:
 USTRUCT(BlueprintType)
 struct FMineralItem : public FItem
 {
-	GENERATED_USTRUCT_BODY() 
+	GENERATED_USTRUCT_BODY()
 
 public:
 	FString ClassName();
@@ -322,7 +321,7 @@ public:
 
 	FString MakeString()  override;
 
-	//Name of the Mine
+	//Name of the ClampMine
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		FString _ClassName;
 
@@ -338,7 +337,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UItemBase* _Item;
 
-	//Resource Mined in the zone 
+	//Resource ClampMined in the zone 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		TArray<UItemBase*> _ItemMined;
 
@@ -355,7 +354,7 @@ USTRUCT(BlueprintType)
 struct FProcessItem : public FItem
 {
 
-	GENERATED_USTRUCT_BODY() 
+	GENERATED_USTRUCT_BODY()
 
 public:
 	FString ClassName();
@@ -399,7 +398,7 @@ public:
 USTRUCT(BlueprintType)
 struct FResourceItem : public FItem
 {
-	GENERATED_USTRUCT_BODY() 
+	GENERATED_USTRUCT_BODY()
 
 public:
 	FString ClassName();
@@ -442,7 +441,7 @@ public:
 USTRUCT(BlueprintType)
 struct FSpawnItem : public FItem
 {
-	GENERATED_USTRUCT_BODY() 
+	GENERATED_USTRUCT_BODY()
 
 public:
 	FString ClassName();
@@ -485,7 +484,7 @@ public:
 USTRUCT(BlueprintType)
 struct FVehicleTexture : public FItem
 {
-	GENERATED_USTRUCT_BODY() 
+	GENERATED_USTRUCT_BODY()
 public:
 	FString MakeString() override;
 
@@ -509,7 +508,7 @@ public:
 USTRUCT(BlueprintType)
 struct FVehicleItem : public FItem
 {
-	GENERATED_USTRUCT_BODY() 
+	GENERATED_USTRUCT_BODY()
 public:
 	FString ClassName();
 
@@ -551,7 +550,7 @@ public:
 USTRUCT(BlueprintType)
 struct FWeaponItem : public FItem
 {
-	GENERATED_USTRUCT_BODY() 
+	GENERATED_USTRUCT_BODY()
 public:
 	FString ClassName();
 
@@ -588,6 +587,75 @@ public:
 	bool _IsEndString;
 };
 
+USTRUCT(BlueprintType)
+struct FContainer
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	FContainer() {}
+	FContainer(FName rowName)
+	{
+		const auto row = rowName.ToString();
+
+		if (row.Contains("Concealed"))
+		{
+			_Percentge = 1.3f;			
+		}
+		else
+		{
+			_Percentge = 1.1f;
+		}
+		if (row.Contains("SmallCrate"))
+		{
+			_ContainerSize = 10;
+			_Weight = 5;
+		}
+
+		if (row.Contains("MediumCrate"))
+		{
+			_ContainerSize = 30;
+			_Weight = 25;
+		}
+
+		if (row.Contains("LargeCrate"))
+		{
+			_ContainerSize = 50;
+			_Weight = 45;
+		}
+
+		if (row.Contains("ExtraLargeCrate"))
+		{
+			_ContainerSize = 70;
+			_Weight = 65;
+		}
+
+		if (row.Contains("ExtremeCrate"))
+		{
+			_ContainerSize = 100;
+			_Weight = 95;
+		}
+	}
+
+	UPROPERTY(EditAnywhere)
+		float _Percentge = 0;
+
+	UPROPERTY(EditAnywhere)
+		int32 _ContainerSize = 0;
+
+	int _Weight = 0;
+
+
+	bool operator==(const FContainer& a) const
+	{
+		return _Percentge == a._Percentge && _ContainerSize == a._ContainerSize;
+	}
+};
+
+FORCEINLINE uint32 GetTypeHash(const FContainer& b)
+{
+	return FCrc::MemCrc_DEPRECATED(&b, sizeof(FContainer));
+}
+
 UCLASS(Blueprintable, BlueprintType)
 class ARMA3CONFIG_API UCreateConfig : public UObject
 {
@@ -623,10 +691,10 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Row Quick Editor")
 		FName _SearchForRowsContaining;
-	
+
 	// Array Element 1 = Price increase , 2 = weight
 	UPROPERTY(EditAnywhere, Category = "Row Quick Editor")
-		TMap<FName, TArray<int32>> _VirtualItemsQuickEditor;
+		TMap<FName, FContainer> _VirtualItemsQuickEditor;
 
 	UPROPERTY(EditAnywhere, Category = "Row Quick Editor")
 		FVirtualItem _ExactItem;
@@ -641,7 +709,7 @@ public:
 UCLASS(BlueprintType)
 class ARMA3CONFIG_API UItemBase : public UDataAsset
 {
-GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
 	static FString MapName();

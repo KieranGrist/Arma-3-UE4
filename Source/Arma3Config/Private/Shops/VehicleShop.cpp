@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "Shops/VehicleShop.h"
-#include "Items/VehicleItem.h"
 
 FString UVehicleShop::ClassName()
 {

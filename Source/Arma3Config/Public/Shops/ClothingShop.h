@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Items/ItemBase.h"
+#include "CreateConfig.h"
 
 #include "ClothingShop.generated.h"
 
@@ -22,22 +22,22 @@ public:
 		FString _Conditions;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FSide _ShopSide = FSide::civ;
+		ESide _ShopSide = ESide::civ;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray < UClothingItem*> _Uniforms;
+		TArray <UItemBase*> _Uniforms;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray < UClothingItem*> _Headgear;
+		TArray <UItemBase*> _Headgear;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray < UClothingItem*> _Goggles;
+		TArray <UItemBase*> _Goggles;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray < UClothingItem*> _Vests;
+		TArray <UItemBase*> _Vests;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray <UClothingItem*> _Backpacks;
+		TArray <UItemBase*> _Backpacks;
 
 	FString  ClassName();
 	FString  ShopName();

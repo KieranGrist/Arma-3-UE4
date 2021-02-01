@@ -3,11 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Items/ItemBase.h"
+#include "CreateConfig.h"
 
 #include "WeaponShop.generated.h"
-
-class UWeaponItem;
 
 UCLASS(BlueprintType)
 class ARMA3CONFIG_API UWeaponShop : public UItemBase
@@ -19,19 +17,19 @@ public:
 		FName _ShopName;
 		
 		UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FSide _ShopSide = FSide::civ;
+		ESide _ShopSide = ESide::civ;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 		FString _Conditions;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray<UWeaponItem*> _Weapons;
+		TArray<UItemBase*> _Weapons;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray<UWeaponItem*> _Magazines;
+		TArray<UItemBase*> _Magazines;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray<UWeaponItem*> _Accessories;
+		TArray<UItemBase*> _Accessories;
 
 	FString ClassName();
 	FString ShopName();

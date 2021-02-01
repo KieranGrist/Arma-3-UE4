@@ -3,11 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Items/ItemBase.h"
+#include "CreateConfig.h"
 
 #include "VirtualItemShop.generated.h"
-
-class UVehicleItem;
 
 UCLASS(BlueprintType)
 class ARMA3CONFIG_API UVirtualItemShop : public UItemBase
@@ -22,13 +20,13 @@ public:
 		FName _ShopName;
 		
 		UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FSide _ShopSide = FSide::civ;
+		ESide _ShopSide = ESide::civ;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 		FString _Conditions;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray<UVirtualItem*> _Items;
+		TArray<UItemBase*> _Items;
 
 	FString ClassName();
 	FString ShopName();

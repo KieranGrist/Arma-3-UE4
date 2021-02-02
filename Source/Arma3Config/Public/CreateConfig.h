@@ -22,7 +22,7 @@ struct FItem : public FTableRowBase
 public:
 
 	UPROPERTY(EditAnywhere)
-		FName  _RowName;
+		FString  _RowName;
 
 	virtual FString MakeString() { return "Reached base item"; };
 
@@ -593,11 +593,10 @@ struct FContainer
 	GENERATED_USTRUCT_BODY()
 public:
 	FContainer() {}
-	FContainer(FName rowName)
+	FContainer(FString rowName)
 	{
-		const auto row = rowName.ToString();
-
-		if (row.Contains("Concealed"))
+		_RowName = rowName;
+		if (rowName.Contains("Concealed"))
 		{
 			_Percentge = 1.3f;			
 		}
@@ -605,34 +604,34 @@ public:
 		{
 			_Percentge = 1.1f;
 		}
-		if (row.Contains("SmallCrate"))
+		if (rowName.Contains("SmallCrate"))
 		{
 			_ContainerSize = 10;
 			_Weight = 5;
 		}
 
-		if (row.Contains("MediumCrate"))
+		if (rowName.Contains("MediumCrate"))
 		{
 			_ContainerSize = 30;
-			_Weight = 25;
+			_Weight = 10;
 		}
 
-		if (row.Contains("LargeCrate"))
+		if (rowName.Contains("LargeCrate"))
 		{
 			_ContainerSize = 50;
-			_Weight = 45;
+			_Weight = 15;
 		}
 
-		if (row.Contains("ExtraLargeCrate"))
+		if (rowName.Contains("ExtraLargeCrate"))
 		{
 			_ContainerSize = 70;
-			_Weight = 65;
+			_Weight = 20;
 		}
 
-		if (row.Contains("ExtremeCrate"))
+		if (rowName.Contains("ExtremeCrate"))
 		{
 			_ContainerSize = 100;
-			_Weight = 95;
+			_Weight = 25;
 		}
 	}
 
@@ -643,7 +642,8 @@ public:
 		int32 _ContainerSize = 0;
 
 	int _Weight = 0;
-
+	
+	FString _RowName = "";
 
 	bool operator==(const FContainer& a) const
 	{
@@ -674,6 +674,8 @@ public:
 	UFUNCTION(CallInEditor, Category = "Table Editor")
 		void SetAllRowNames();
 
+	static bool NameContains(FName name1, FString name2);
+
 	UPROPERTY(EditAnywhere, Category = "Table Editor")
 		UDataTable* _VirtualItems;
 
@@ -689,21 +691,23 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Object Editor")
 		FString _Path = "/Game/Arma3Config/Items/VirtualItems/";
 
-	UPROPERTY(EditAnywhere, Category = "Row Quick Editor")
-		FName _SearchForRowsContaining;
-
-	// Array Element 1 = Price increase , 2 = weight
-	UPROPERTY(EditAnywhere, Category = "Row Quick Editor")
-		TMap<FName, FContainer> _VirtualItemsQuickEditor;
-
-	UPROPERTY(EditAnywhere, Category = "Row Quick Editor")
-		FVirtualItem _ExactItem;
+	// Row Quick Editor
+	UFUNCTION(CallInEditor, Category = "Row Quick Editor")
+	void GrabRows();
 
 	UFUNCTION(CallInEditor, Category = "Row Quick Editor")
-		void DataTableToQuickEditor();
+	void RowsToDataTable();
+	
+	UPROPERTY(EditAnywhere, Category = "Row Quick Editor")
+	TArray<FString> _GrabRowsContaining;
+	
+	UPROPERTY(EditAnywhere, Category = "Row Quick Editor")
+	TArray<FContainer> _QuickDataEditor;
+	
+	UPROPERTY(EditAnywhere, Category = "Row Quick Editor")
+	TArray<FVirtualItem> _ExactItems;
 
-	UFUNCTION(CallInEditor, Category = "Row Quick Editor")
-		void QuickEditorToDataTable();
+	TArray<FVirtualItem> _GrabbedItems;
 };
 
 UCLASS(BlueprintType)

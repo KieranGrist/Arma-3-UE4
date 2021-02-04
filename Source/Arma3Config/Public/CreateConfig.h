@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Engine/DataTable.h"
+#include "Containers/Map.h"
 
 #include "CreateConfig.generated.h"
 
@@ -22,10 +23,10 @@ struct FItem : public FTableRowBase
 public:
 
 	UPROPERTY(EditAnywhere)
-		FString  _RowName;
+		FString  _RowName = "NoRowName";
 
 	virtual FString MakeString() { return "Reached base item"; };
-
+	virtual bool IsValid() const { return _RowName != "NoRowName"; }
 };
 
 USTRUCT(BlueprintType)
@@ -57,9 +58,14 @@ public:
 
 	FString ProcessedItem();
 
+	bool IsValid() const override
+	{
+		return Super::IsValid() && _VariableName.IsValid() && _DisplayName.IsValid();
+	}
+
 	bool operator==(const FVirtualItem& a) const
 	{
-		return _VariableName == a._VariableName && _DisplayName == a._DisplayName;
+		return _VariableName == a._VariableName && _DisplayName == a._DisplayName && _RowName == a._RowName;
 	}
 
 	//variable = Variable Name This is also the class name
@@ -71,8 +77,8 @@ public:
 		FName _DisplayName;
 
 	//weight = Item Weight
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ClampMin = -1))
-		int _ItemWeight = -1;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ClampMin = 1))
+		int _ItemWeight = 1;
 
 	//buyPrice = Item Buy Price
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ClampMin = -1))
@@ -111,7 +117,7 @@ public:
 	int _ClassMembersTabs = 3;
 };
 
-FORCEINLINE uint32 GetTypeHash(const FVirtualItem& b)
+FORCEINLINE uint32 GetTypeHash(FVirtualItem& b)
 {
 	return FCrc::MemCrc_DEPRECATED(&b, sizeof(FVirtualItem));
 }
@@ -588,73 +594,45 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct FContainer
+struct FContainerItem : public FVirtualItem
 {
 	GENERATED_USTRUCT_BODY()
 public:
-	FContainer() {}
-	FContainer(FString rowName)
-	{
-		_RowName = rowName;
-		if (rowName.Contains("Concealed"))
-		{
-			_Percentge = 1.3f;			
-		}
-		else
-		{
-			_Percentge = 1.1f;
-		}
-		if (rowName.Contains("SmallCrate"))
-		{
-			_ContainerSize = 10;
-			_Weight = 5;
-		}
-
-		if (rowName.Contains("MediumCrate"))
-		{
-			_ContainerSize = 30;
-			_Weight = 10;
-		}
-
-		if (rowName.Contains("LargeCrate"))
-		{
-			_ContainerSize = 50;
-			_Weight = 15;
-		}
-
-		if (rowName.Contains("ExtraLargeCrate"))
-		{
-			_ContainerSize = 70;
-			_Weight = 20;
-		}
-
-		if (rowName.Contains("ExtremeCrate"))
-		{
-			_ContainerSize = 100;
-			_Weight = 25;
-		}
-	}
-
+	FContainerItem() {}
+	// Percentage increase on sell price
 	UPROPERTY(EditAnywhere)
 		float _Percentge = 0;
 
-	UPROPERTY(EditAnywhere)
+	// How many items this container can fit
+	UPROPERTY(EditAnywhere, Meta = (ClampMin = -1))
 		int32 _ContainerSize = 0;
-
-	int _Weight = 0;
-	
-	FString _RowName = "";
-
-	bool operator==(const FContainer& a) const
+	const bool operator==(const FContainerItem& a) const
 	{
 		return _Percentge == a._Percentge && _ContainerSize == a._ContainerSize;
 	}
+	FContainerItem(FString rowName);
 };
 
-FORCEINLINE uint32 GetTypeHash(const FContainer& b)
+FORCEINLINE uint32 GetTypeHash(FContainerItem& b)
 {
-	return FCrc::MemCrc_DEPRECATED(&b, sizeof(FContainer));
+	return FCrc::MemCrc_DEPRECATED(&b, sizeof(FContainerItem));
 }
+
+UENUM(BlueprintType)
+enum class EItemClass : uint8
+{
+	VirtualItem,
+	ClothingItems,
+	GarageItems,
+	HouseItems,
+	LicenseItems,
+	MineralItems,
+	ProcessItems,
+	ResourceItems,
+	VehicleItems,
+	WeaponItems,
+	Containers
+};
 
 UCLASS(Blueprintable, BlueprintType)
 class ARMA3CONFIG_API UCreateConfig : public UObject
@@ -662,52 +640,772 @@ class ARMA3CONFIG_API UCreateConfig : public UObject
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(CallInEditor, Category = "Object Editor")
-		void DataTableToUObjects();
 
-	UFUNCTION(CallInEditor, Category = "Table Editor")
-		void DeleteRows();
-
-	UFUNCTION(CallInEditor, Category = "Table Editor")
-		void CreateOrUpdateTableRows();
-
-	UFUNCTION(CallInEditor, Category = "Table Editor")
-		void SetAllRowNames();
-
-	static bool NameContains(FName name1, FString name2);
-
-	UPROPERTY(EditAnywhere, Category = "Table Editor")
+	UFUNCTION(BlueprintImplementableEvent)
+		void PresentNotification(const FString& notificationToPrint);
+	UPROPERTY(EditAnywhere, Category = "Configs")
 		UDataTable* _VirtualItems;
+	UPROPERTY(EditAnywhere, Category = "Configs")
+		UDataTable* _ClothingItems;
+	UPROPERTY(EditAnywhere, Category = "Configs")
+		UDataTable* _GarageItems;
+	UPROPERTY(EditAnywhere, Category = "Configs")
+		UDataTable* _HouseItems;
+	UPROPERTY(EditAnywhere, Category = "Configs")
+		UDataTable* _LicenseItems;
+	UPROPERTY(EditAnywhere, Category = "Configs")
+		UDataTable* _MineralItems;
+	UPROPERTY(EditAnywhere, Category = "Configs")
+		UDataTable* _ProcessItems;
+	UPROPERTY(EditAnywhere, Category = "Configs")
+		UDataTable* _ResourceItems;
+	UPROPERTY(EditAnywhere, Category = "Configs")
+		UDataTable* _VehicleItems;
+	UPROPERTY(EditAnywhere, Category = "Configs")
+		UDataTable* _WeaponItems;
+	UPROPERTY(EditAnywhere, Category = "Configs")
+		UDataTable* _ContainerItems;
 
 	UPROPERTY(EditAnywhere, Category = "Table Editor")
 		TArray<FString> _ItemPrefixes;
 
 	UPROPERTY(EditAnywhere, Category = "Table Editor")
 		bool _PrefixAfterName;
+	// If true it will only combine the prefix and name and create one item for each instead of treating them as seperate items 
+	UPROPERTY(EditAnywhere, Category = "Table Editor")
+	bool _IsOnlyCombination;
 
 	UPROPERTY(EditAnywhere, Category = "Table Editor")
 		TArray<FName> _ItemNames;
+
+	UPROPERTY(EditAnywhere, Category = "Table Editor")
+		EItemClass _ItemClass;
+
+	UFUNCTION(CallInEditor, Category = "Table Editor")
+		void CreateOrUpdateTableRows();	
+
+	UFUNCTION(CallInEditor, Category = "Table Editor")
+		void SetAllRowNames();
+
+	// VirtualItem
+	UFUNCTION(CallInEditor, Category = "Object Editor")
+		void DataTableToUObjects();
 
 	UPROPERTY(EditAnywhere, Category = "Object Editor")
 		FString _Path = "/Game/Arma3Config/Items/VirtualItems/";
 
 	// Row Quick Editor
 	UFUNCTION(CallInEditor, Category = "Row Quick Editor")
-	void GrabRows();
+		void GrabRows();
 
 	UFUNCTION(CallInEditor, Category = "Row Quick Editor")
-	void RowsToDataTable();
-	
+		void RowsToDataTable();
+
 	UPROPERTY(EditAnywhere, Category = "Row Quick Editor")
-	TArray<FString> _GrabRowsContaining;
-	
-	UPROPERTY(EditAnywhere, Category = "Row Quick Editor")
-	TArray<FContainer> _QuickDataEditor;
-	
-	UPROPERTY(EditAnywhere, Category = "Row Quick Editor")
+		TArray<FString> _GrabRowsContaining;
+
 	TArray<FVirtualItem> _ExactItems;
 
-	TArray<FVirtualItem> _GrabbedItems;
+
+
+private:
+	void CreateVirtualItems()
+	{
+		FVirtualItem configItem;
+		FName rowName;
+		for (auto itemName : _ItemNames)
+		{
+			rowName = itemName;
+
+			if (_VirtualItems->FindRow<FVirtualItem>(rowName, "UCreateConfig::CrateOrUpdateTableRows()", false))
+			{
+				_VirtualItems->RemoveRow(rowName);
+			}
+
+			configItem = FVirtualItem();
+			configItem._RowName = rowName.ToString();
+			configItem._VariableName = rowName;
+			configItem._DisplayName = rowName;
+			configItem._ProcessedItem = nullptr;
+
+			_VirtualItems->AddRow(rowName, configItem);
+		}
+
+		for (auto itemPrefix : _ItemPrefixes)
+		{
+			rowName = FName(itemPrefix);
+
+			if (_VirtualItems->FindRow<FVirtualItem>(rowName, "UCreateConfig::CrateOrUpdateTableRows()", false))
+			{
+				_VirtualItems->RemoveRow(rowName);
+			}
+
+			configItem = FVirtualItem();
+			configItem._RowName = rowName.ToString();
+			configItem._VariableName = rowName;
+			configItem._DisplayName = rowName;
+			configItem._ProcessedItem = nullptr;
+
+			_VirtualItems->AddRow(rowName, configItem);
+
+			for (auto itemName : _ItemNames)
+			{
+				rowName = _PrefixAfterName ? FName(itemName.ToString() + itemPrefix) : FName(itemPrefix + itemName.ToString());
+
+				if (_VirtualItems->FindRow<FVirtualItem>(rowName, "UCreateConfig::CrateOrUpdateTableRows()", false))
+				{
+					_VirtualItems->RemoveRow(rowName);
+				}
+
+				configItem = FVirtualItem();
+				configItem._RowName = rowName.ToString();
+				configItem._VariableName = rowName;
+				configItem._DisplayName = rowName;
+				configItem._ProcessedItem = nullptr;
+
+				_VirtualItems->AddRow(rowName, configItem);
+			}
+		}
+	}
+
+
+
+	void CreateContainerItems()
+	{
+		FContainerItem configItem;
+		FName rowName;
+		if (!_IsOnlyCombination)
+		{
+			for (auto itemName : _ItemNames)
+			{
+				rowName = itemName;
+
+				if (_ContainerItems->FindRow<FContainerItem>(rowName, "UCreateConfig::CrateOrUpdateTableRows()", false))
+				{
+					_ContainerItems->RemoveRow(rowName);
+				}
+
+				configItem = FContainerItem(rowName.ToString());
+				configItem._RowName = rowName.ToString();
+				configItem._VariableName = rowName;
+				configItem._DisplayName = rowName;
+				configItem._ProcessedItem = nullptr;
+
+				_ContainerItems->AddRow(rowName, configItem);
+			}
+
+			for (auto itemPrefix : _ItemPrefixes)
+			{
+				rowName = FName(itemPrefix);
+
+				if (_ContainerItems->FindRow<FContainerItem>(rowName, "UCreateConfig::CrateOrUpdateTableRows()", false))
+				{
+					_ContainerItems->RemoveRow(rowName);
+				}
+
+				configItem = FContainerItem(rowName.ToString());
+				configItem._RowName = rowName.ToString();
+				configItem._VariableName = rowName;
+				configItem._DisplayName = rowName;
+				configItem._ProcessedItem = nullptr;
+
+				_ContainerItems->AddRow(rowName, configItem);
+
+				for (auto itemName : _ItemNames)
+				{
+					rowName = _PrefixAfterName ? FName(itemName.ToString() + itemPrefix) : FName(itemPrefix + itemName.ToString());
+
+					if (_ContainerItems->FindRow<FContainerItem>(rowName, "UCreateConfig::CrateOrUpdateTableRows()", false))
+					{
+						_ContainerItems->RemoveRow(rowName);
+					}
+
+					configItem = FContainerItem(rowName.ToString());
+					configItem._RowName = rowName.ToString();
+					configItem._VariableName = rowName;
+					configItem._DisplayName = rowName;
+					configItem._ProcessedItem = nullptr;
+
+					_ContainerItems->AddRow(rowName, configItem);
+				}
+			}
+		}
+		else
+		{
+			for (auto itemPrefix : _ItemPrefixes)
+			{
+				for (auto itemName : _ItemNames)
+				{
+					rowName = _PrefixAfterName ? FName(itemName.ToString() + itemPrefix) : FName(itemPrefix + itemName.ToString());
+
+					if (_ContainerItems->FindRow<FContainerItem>(rowName, "UCreateConfig::CrateOrUpdateTableRows()", false))
+					{
+						_ContainerItems->RemoveRow(rowName);
+					}
+
+					configItem = FContainerItem(rowName.ToString());
+					configItem._RowName = rowName.ToString();
+			 		configItem._VariableName = rowName;
+					configItem._DisplayName = rowName;
+					configItem._ProcessedItem = nullptr;
+
+					_ContainerItems->AddRow(rowName, configItem);
+				}
+			}
+
+		}
+	}
+
+private:
+	TArray<FVirtualItem> ListOfContainedItems(TArray<FVirtualItem*> virtualItems, FString rowName)
+	{
+		TArray<FVirtualItem> containedItem;
+		for (FVirtualItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Contains(rowName))
+			{
+				containedItem.Add(*virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	TArray<FVirtualItem> ListOfContainedItems(TArray<FVirtualItem> virtualItems, FString rowName)
+	{
+		TArray<FVirtualItem> containedItem;
+		for (FVirtualItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Contains(rowName))
+			{
+				containedItem.Add(virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	FVirtualItem FindItem(TArray<FVirtualItem> virtualItems, FString rowName)
+	{
+		for (FVirtualItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Compare(rowName) == 0)
+			{
+				return virtualItem;
+			}
+		}
+		return  FVirtualItem();
+	}
+
+	FVirtualItem FindItem(TArray<FVirtualItem*> virtualItems, FString rowName)
+	{
+		for (auto* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Compare(rowName) == 0)
+			{
+				return *virtualItem;
+			}
+		}
+		return FVirtualItem();
+	}
+
+	TArray<FClothingItem> ListOfContainedItems(TArray<FClothingItem*> virtualItems, FString rowName)
+	{
+		TArray<FClothingItem> containedItem;
+		for (FClothingItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Contains(rowName))
+			{
+				containedItem.Add(*virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	TArray<FClothingItem> ListOfContainedItems(TArray<FClothingItem> virtualItems, FString rowName)
+	{
+		TArray<FClothingItem> containedItem;
+		for (FClothingItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Contains(rowName))
+			{
+				containedItem.Add(virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	FClothingItem FindItem(TArray<FClothingItem> virtualItems, FString rowName)
+	{
+		for (FClothingItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Compare(rowName) == 0)
+			{
+				return virtualItem;
+			}
+		}
+		return  FClothingItem();
+	}
+
+	FClothingItem FindItem(TArray<FClothingItem*> virtualItems, FString rowName)
+	{
+		for (FClothingItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Compare(rowName) == 0)
+			{
+				return *virtualItem;
+			}
+		}
+		return FClothingItem();
+	}
+
+	TArray<FGarageItem> ListOfContainedItems(TArray<FGarageItem*> virtualItems, FString rowName)
+	{
+		TArray<FGarageItem> containedItem;
+		for (FGarageItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Contains(rowName))
+			{
+				containedItem.Add(*virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	TArray<FGarageItem> ListOfContainedItems(TArray<FGarageItem> virtualItems, FString rowName)
+	{
+		TArray<FGarageItem> containedItem;
+		for (FGarageItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Contains(rowName))
+			{
+				containedItem.Add(virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	FGarageItem FindItem(TArray<FGarageItem> virtualItems, FString rowName)
+	{
+		for (FGarageItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Compare(rowName) == 0)
+			{
+				return virtualItem;
+			}
+		}
+		return  FGarageItem();
+	}
+
+	FGarageItem FindItem(TArray<FGarageItem*> virtualItems, FString rowName)
+	{
+		for (FGarageItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Compare(rowName) == 0)
+			{
+				return *virtualItem;
+			}
+		}
+		return FGarageItem();
+	}
+
+	TArray<FHouseItem> ListOfContainedItems(TArray<FHouseItem*> virtualItems, FString rowName)
+	{
+		TArray<FHouseItem> containedItem;
+		for (FHouseItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Contains(rowName))
+			{
+				containedItem.Add(*virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	TArray<FHouseItem> ListOfContainedItems(TArray<FHouseItem> virtualItems, FString rowName)
+	{
+		TArray<FHouseItem> containedItem;
+		for (FHouseItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Contains(rowName))
+			{
+				containedItem.Add(virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	FHouseItem FindItem(TArray<FHouseItem> virtualItems, FString rowName)
+	{
+		for (FHouseItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Compare(rowName) == 0)
+			{
+				return virtualItem;
+			}
+		}
+		return  FHouseItem();
+	}
+
+	FHouseItem FindItem(TArray<FHouseItem*> virtualItems, FString rowName)
+	{
+		for (FHouseItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Compare(rowName) == 0)
+			{
+				return *virtualItem;
+			}
+		}
+		return FHouseItem();
+	}
+
+	TArray<FLicenseItem> ListOfContainedItems(TArray<FLicenseItem*> virtualItems, FString rowName)
+	{
+		TArray<FLicenseItem> containedItem;
+		for (FLicenseItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Contains(rowName))
+			{
+				containedItem.Add(*virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	TArray<FLicenseItem> ListOfContainedItems(TArray<FLicenseItem> virtualItems, FString rowName)
+	{
+		TArray<FLicenseItem> containedItem;
+		for (FLicenseItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Contains(rowName))
+			{
+				containedItem.Add(virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	FLicenseItem FindItem(TArray<FLicenseItem> virtualItems, FString rowName)
+	{
+		for (FLicenseItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Compare(rowName) == 0)
+			{
+				return virtualItem;
+			}
+		}
+		return  FLicenseItem();
+	}
+
+	FLicenseItem FindItem(TArray<FLicenseItem*> virtualItems, FString rowName)
+	{
+		for (FLicenseItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Compare(rowName) == 0)
+			{
+				return *virtualItem;
+			}
+		}
+		return FLicenseItem();
+	}
+
+	TArray<FMineralItem> ListOfContainedItems(TArray<FMineralItem*> virtualItems, FString rowName)
+	{
+		TArray<FMineralItem> containedItem;
+		for (FMineralItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Contains(rowName))
+			{
+				containedItem.Add(*virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	TArray<FMineralItem> ListOfContainedItems(TArray<FMineralItem> virtualItems, FString rowName)
+	{
+		TArray<FMineralItem> containedItem;
+		for (FMineralItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Contains(rowName))
+			{
+				containedItem.Add(virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	FMineralItem FindItem(TArray<FMineralItem> virtualItems, FString rowName)
+	{
+		for (FMineralItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Compare(rowName) == 0)
+			{
+				return virtualItem;
+			}
+		}
+		return  FMineralItem();
+	}
+
+	FMineralItem FindItem(TArray<FMineralItem*> virtualItems, FString rowName)
+	{
+		for (FMineralItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Compare(rowName) == 0)
+			{
+				return *virtualItem;
+			}
+		}
+		return FMineralItem();
+	}
+
+	TArray<FProcessItem> ListOfContainedItems(TArray<FProcessItem*> virtualItems, FString rowName)
+	{
+		TArray<FProcessItem> containedItem;
+		for (FProcessItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Contains(rowName))
+			{
+				containedItem.Add(*virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	TArray<FProcessItem> ListOfContainedItems(TArray<FProcessItem> virtualItems, FString rowName)
+	{
+		TArray<FProcessItem> containedItem;
+		for (FProcessItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Contains(rowName))
+			{
+				containedItem.Add(virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	FProcessItem FindItem(TArray<FProcessItem> virtualItems, FString rowName)
+	{
+		for (FProcessItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Compare(rowName) == 0)
+			{
+				return virtualItem;
+			}
+		}
+		return  FProcessItem();
+	}
+
+	FProcessItem FindItem(TArray<FProcessItem*> virtualItems, FString rowName)
+	{
+		for (FProcessItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Compare(rowName) == 0)
+			{
+				return *virtualItem;
+			}
+		}
+		return FProcessItem();
+	}
+
+	TArray<FResourceItem> ListOfContainedItems(TArray<FResourceItem*> virtualItems, FString rowName)
+	{
+		TArray<FResourceItem> containedItem;
+		for (FResourceItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Contains(rowName))
+			{
+				containedItem.Add(*virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	TArray<FResourceItem> ListOfContainedItems(TArray<FResourceItem> virtualItems, FString rowName)
+	{
+		TArray<FResourceItem> containedItem;
+		for (FResourceItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Contains(rowName))
+			{
+				containedItem.Add(virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	FResourceItem FindItem(TArray<FResourceItem> virtualItems, FString rowName)
+	{
+		for (FResourceItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Compare(rowName) == 0)
+			{
+				return virtualItem;
+			}
+		}
+		return  FResourceItem();
+	}
+
+	FResourceItem FindItem(TArray<FResourceItem*> virtualItems, FString rowName)
+	{
+		for (FResourceItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Compare(rowName) == 0)
+			{
+				return *virtualItem;
+			}
+		}
+		return FResourceItem();
+	}
+
+	TArray<FVehicleItem> ListOfContainedItems(TArray<FVehicleItem*> virtualItems, FString rowName)
+	{
+		TArray<FVehicleItem> containedItem;
+		for (FVehicleItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Contains(rowName))
+			{
+				containedItem.Add(*virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	TArray<FVehicleItem> ListOfContainedItems(TArray<FVehicleItem> virtualItems, FString rowName)
+	{
+		TArray<FVehicleItem> containedItem;
+		for (FVehicleItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Contains(rowName))
+			{
+				containedItem.Add(virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	FVehicleItem FindItem(TArray<FVehicleItem> virtualItems, FString rowName)
+	{
+		for (FVehicleItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Compare(rowName) == 0)
+			{
+				return virtualItem;
+			}
+		}
+		return  FVehicleItem();
+	}
+
+	FVehicleItem FindItem(TArray<FVehicleItem*> virtualItems, FString rowName)
+	{
+		for (FVehicleItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Compare(rowName) == 0)
+			{
+				return *virtualItem;
+			}
+		}
+		return FVehicleItem();
+	}
+
+	TArray<FWeaponItem> ListOfContainedItems(TArray<FWeaponItem*> virtualItems, FString rowName)
+	{
+		TArray<FWeaponItem> containedItem;
+		for (FWeaponItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Contains(rowName))
+			{
+				containedItem.Add(*virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	TArray<FWeaponItem> ListOfContainedItems(TArray<FWeaponItem> virtualItems, FString rowName)
+	{
+		TArray<FWeaponItem> containedItem;
+		for (FWeaponItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Contains(rowName))
+			{
+				containedItem.Add(virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	FWeaponItem FindItem(TArray<FWeaponItem> virtualItems, FString rowName)
+	{
+		for (FWeaponItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Compare(rowName) == 0)
+			{
+				return virtualItem;
+			}
+		}
+		return  FWeaponItem();
+	}
+
+	FWeaponItem FindItem(TArray<FWeaponItem*> virtualItems, FString rowName)
+	{
+		for (FWeaponItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Compare(rowName) == 0)
+			{
+				return *virtualItem;
+			}
+		}
+		return FWeaponItem();
+	}
+
+	TArray<FContainerItem> ListOfContainedItems(TArray<FContainerItem*> virtualItems, FString rowName)
+	{
+		TArray<FContainerItem> containedItem;
+		for (FContainerItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Contains(rowName))
+			{
+				containedItem.Add(*virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	TArray<FContainerItem> ListOfContainedItems(TArray<FContainerItem> virtualItems, FString rowName)
+	{
+		TArray<FContainerItem> containedItem;
+		for (FContainerItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Contains(rowName))
+			{
+				containedItem.Add(virtualItem);
+			}
+		}
+		return containedItem;
+	}
+
+	FContainerItem FindItem(TArray<FContainerItem> virtualItems, FString rowName)
+	{
+		for (FContainerItem virtualItem : virtualItems)
+		{
+			if (virtualItem._RowName.Compare(rowName) == 0)
+			{
+				return virtualItem;
+			}
+		}
+		return  FContainerItem();
+	}
+
+	FContainerItem FindItem(TArray<FContainerItem*> virtualItems, FString rowName)
+	{
+		for (FContainerItem* virtualItem : virtualItems)
+		{
+			if (virtualItem->_RowName.Compare(rowName) == 0)
+			{
+				return *virtualItem;
+			}
+		}
+		return FContainerItem();
+	}
 };
 
 UCLASS(BlueprintType)
@@ -751,5 +1449,6 @@ public:
 	static FString ClassMember(FString name, int classMemberTabs, TArray<FString> stringArray);
 	static FString ClassMember(FString name, int classMemberTabs, TArray<UItemBase*> virtualItem);
 	static FString ClassMember(FString name, int classMemberTabs, TMap<UItemBase*, FString>  vehicleItems);
+
 	FItem _Item;
 };

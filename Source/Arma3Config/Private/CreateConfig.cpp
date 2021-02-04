@@ -9,7 +9,7 @@ void UCreateConfig::DataTableToUObjects()
 	TArray<FVirtualItem*> vItems;
 	_VirtualItems->GetAllRows<FVirtualItem>(contextString, vItems);
 	EObjectFlags flags = RF_Public | RF_Standalone;
-	for (const auto vItem : vItems)
+	for (auto vItem : vItems)
 	{
 		FString packageName = _Path + vItem->_VariableName.ToString();
 		UPackage* package = CreatePackage(*packageName);
@@ -27,131 +27,58 @@ void UCreateConfig::DataTableToUObjects()
 	}
 }
 
-void UCreateConfig::DeleteRows()
-{
-	auto rowNames = _VirtualItems->GetRowNames();
-	for (const auto rowName : rowNames)
-	{
-		_VirtualItems->RemoveRow(rowName);
-	}
-}
-
 void UCreateConfig::CreateOrUpdateTableRows()
 {
-	// Note to self, you can find rows by the row name update the row instead of creating it if found.
-	FVirtualItem virtualItem;
-	FName rowName;
-	for (const auto itemName : _ItemNames)
+	switch (_ItemClass)
 	{
-		rowName = itemName;
-
-		if (_VirtualItems->FindRow<FVirtualItem>(rowName, "UCreateConfig::CrateOrUpdateTableRows()", false))
-		{
-			_VirtualItems->RemoveRow(rowName);
-		}
-
-		virtualItem = FVirtualItem();
-		virtualItem._RowName = rowName.ToString();
-		virtualItem._VariableName = rowName;
-		virtualItem._DisplayName = rowName;
-		virtualItem._ProcessedItem = nullptr;
-
-		_VirtualItems->AddRow(rowName, virtualItem);
+	case EItemClass::VirtualItem:
+		CreateVirtualItems();
+		break;
+	case EItemClass::ClothingItems:
+		break;
+	case EItemClass::GarageItems:
+		break;
+	case EItemClass::HouseItems:
+		break;
+	case EItemClass::LicenseItems:
+		break;
+	case EItemClass::MineralItems:
+		break;
+	case EItemClass::ProcessItems:
+		break;
+	case EItemClass::ResourceItems:
+		break;
+	case EItemClass::VehicleItems:
+		break;
+	case EItemClass::WeaponItems:
+		break;
+	case EItemClass::Containers:
+		CreateContainerItems();
+		break;
+	default:
+		break;
 	}
 
-	for (const auto itemPrefix : _ItemPrefixes)
-	{
-		rowName = FName(itemPrefix);
-
-		if (_VirtualItems->FindRow<FVirtualItem>(rowName, "UCreateConfig::CrateOrUpdateTableRows()", false))
-		{
-			_VirtualItems->RemoveRow(rowName);
-		}
-
-		virtualItem = FVirtualItem();
-		virtualItem._RowName = rowName.ToString();
-		virtualItem._VariableName = rowName;
-		virtualItem._DisplayName = rowName;
-		virtualItem._ProcessedItem = nullptr;
-
-		_VirtualItems->AddRow(rowName, virtualItem);
-
-		for (const auto itemName : _ItemNames)
-		{
-			rowName = _PrefixAfterName ? FName(itemName.ToString() + itemPrefix) : FName(itemPrefix + itemName.ToString());
-
-			if (_VirtualItems->FindRow<FVirtualItem>(rowName, "UCreateConfig::CrateOrUpdateTableRows()", false))
-			{
-				_VirtualItems->RemoveRow(rowName);
-			}
-
-			virtualItem = FVirtualItem();
-			virtualItem._RowName = rowName.ToString();
-			virtualItem._VariableName = rowName;
-			virtualItem._DisplayName = rowName;
-			virtualItem._ProcessedItem = nullptr;
-
-			_VirtualItems->AddRow(rowName, virtualItem);
-		}
-	}
 }
 
 void UCreateConfig::SetAllRowNames()
 {
-	for (const auto rowName : _VirtualItems->GetRowNames())
+	for (auto rowName : _VirtualItems->GetRowNames())
 	{
 		_VirtualItems->FindRow<FVirtualItem>(rowName, "UCreateConfig::CrateOrUpdateTableRows()", false)->_RowName = rowName.ToString();
 	}
 }
 
-FVirtualItem ListOfContainedItems(const TArray<FVirtualItem> virtualItems, FString rowName)
+
+
+FString ToString(FString prefix, float a)
 {
-	TArray<FVirtualItem> containedItem,
-		for (const auto virtualItem : virtualItems)
-		{
-			if (virtualItem._RowName.Contains(rowName))
-			{
-				containedItem.AddUnique(virtualItem);
-			}
-		}
-	return containedItem;
+	return " " + prefix + " " + FString::SanitizeFloat(a) + "\n";
 }
 
-TArray<FVirtualItem> ListOfContainedItems(const TArray<FVirtualItem*> virtualItems, FString rowName)
+FString ToString(FString prefix, int a)
 {
-	TArray<FVirtualItem> containedItem,
-	for (const auto virtualItem : virtualItems)
-	{
-		if (virtualItem->_RowName.Contains(rowName))
-		{
-			containedItem.AddUnique(*virtualItem);
-		}
-	}
-	return containedItem;
-}
-
-FVirtualItem FindItem(const TArray<FVirtualItem> virtualItems, FString rowName)
-{
-	for (const auto virtualItem : virtualItems)
-	{
-		if (virtualItem.RowName.Compare(rowName) == 0)
-		{
-			return virtualItem;
-		}
-	}
-	return FVirtualItem();
-}
-
-FVirtualItem FindItem(const TArray<FVirtualItem*> virtualItems, FString rowName)
-{
-	for (const auto virtualItem : virtualItems)
-	{
-		if (virtualItem->_RowName.Compare(rowName) == 0)
-		{
-			return *virtualItem;
-		}
-	}
-	return FVirtualItem();
+	return " " + prefix + "= " + FString::FromInt(a) + "\n";
 }
 
 void UCreateConfig::GrabRows()
@@ -159,42 +86,85 @@ void UCreateConfig::GrabRows()
 	TArray<FVirtualItem*> grabbedRows;
 	_VirtualItems->GetAllRows<FVirtualItem>("UCreateConfig::GrabRows()", grabbedRows);
 	_ExactItems.Empty();
-	_GrabbedItems.Empty();
 
-	bool stillRemove = true;
-	for (const auto rowName : _GrabRowsContaining)
+	for (auto rowName : _GrabRowsContaining)
 	{
-		FVirtualItem exactItem = FindItem(grabbedRows, rowName);
-		_ExactItems.AddUnique(exactItem);
-
-		auto rowContainedItems = ListOfContainedItems(grabbedRows, rowName);
-		_GrabbedItems.Emplace(rowContainedItems);
-
-		_GrabbedItems.AddUnique(exactItem);
-
-
-		for (auto containedItem : rowContainedItems)
-		{
-			_QuickDataEditor.Add(FContainer(containedItem._RowName));
-		}
+		_ExactItems.Add(FindItem(grabbedRows, rowName));
 	}
-	_GrabRowsContaining.Empty();
 }
 
 void UCreateConfig::RowsToDataTable()
 {
-	for (const auto grabbedItem : _GrabbedItems)
-	{
-		FString rowName = grabbedItem._RowName;
-		auto quickDataItem = _QuickDataEditor.FindByPredicate([rowName](const FContainer& virtualItem) {return virtualItem._RowName.Contains(rowName); });		
-		auto virtualItem = _VirtualItems->FindRow<FVirtualItem>(FName(rowName), "UCreateConfig::RowsToDataTable");
-		auto exactItem = _ExactItems.FindByPredicate([rowName](const FVirtualItem& virtualItem) {return virtualItem._RowName.Contains(rowName); });
-		
+	TArray<FContainerItem*> containers;
+	_ContainerItems->GetAllRows<FContainerItem>("containers", containers);
 
-		virtualItem->_SellPrice = (exactItem->_SellPrice * quickDataItem->_ContainerSize) * quickDataItem->_Percentge;
-		virtualItem->_ItemWeight = (exactItem->_ItemWeight * quickDataItem->_ContainerSize) + quickDataItem->_Weight;
+	TArray<FVirtualItem*> grabbedRows;
+	_VirtualItems->GetAllRows<FVirtualItem>("UCreateConfig::GrabRows()", grabbedRows);
+
+	for (auto rowName : _GrabRowsContaining)
+	{
+		FVirtualItem exactItem = FindItem(_ExactItems, rowName);
+		FContainerItem container = FindItem(containers, rowName);
+
+		TArray<FVirtualItem> rowContainedItems = ListOfContainedItems(grabbedRows, rowName);
+
+		for (auto containedItem : rowContainedItems)
+		{
+			FVirtualItem* virtualItem = _VirtualItems->FindRow<FVirtualItem>(FName(rowName), "UCreateConfig::RowsToDataTable");
+
+			FString itemsStringDebug = UItemBase::NewLine() + "Items ";
+			itemsStringDebug += "VirtualItem = " + virtualItem->_RowName + ", ";
+			itemsStringDebug += "Exact item = " + exactItem._RowName + ", ";
+			itemsStringDebug += "container = " + container._RowName + UItemBase::NewLine();
+			itemsStringDebug += ToString("Container Buy Price", container._BuyPrice);
+			itemsStringDebug += ToString("Container Weight", container._ItemWeight);
+
+
+			int32 buyPrice = (exactItem._BuyPrice * container._ContainerSize) * container._Percentge;
+
+			FString buyPriceStringDebug = ToString("Buy Price, Container", buyPrice);
+			buyPriceStringDebug += ToString("Buy Price, No Container", exactItem._BuyPrice * container._ContainerSize);
+
+
+
+
+			int32 sellPrice = (exactItem._SellPrice * container._ContainerSize) * container._Percentge;
+
+			FString sellPriceStringDebug = ToString("Sell Price, Container", sellPrice);
+			sellPriceStringDebug += ToString("Sell Price, No Container", exactItem._SellPrice * container._ContainerSize);
+
+
+
+			int32 weight = (exactItem._ItemWeight * container._ContainerSize) + container._ItemWeight;
+
+			FString weightStringDebug = ToString("Weight, Container", weight);
+			sellPriceStringDebug += ToString("Weight, No Container", exactItem._ItemWeight * container._ContainerSize);
+
+			virtualItem->_ItemIllegal = exactItem._ItemIllegal;
+			virtualItem->_BuyPrice = FMath::Clamp(buyPrice, -1, buyPrice);
+			virtualItem->_SellPrice = FMath::Clamp(sellPrice, -1, sellPrice);
+			virtualItem->_ItemWeight = FMath::Clamp(weight, 1, weight);
+
+			PresentNotification("RowsToDataTable" + itemsStringDebug + buyPriceStringDebug + sellPriceStringDebug + weightStringDebug);
+		}
+	}
+
+	for (auto exactItem : _ExactItems)
+	{
+		FString rowName = exactItem._RowName;
+
+		auto virtualItem = _VirtualItems->FindRow<FVirtualItem>(FName(rowName), "UCreateConfig::RowsToDataTable");
+
+		virtualItem->_ItemIllegal = exactItem._ItemIllegal;
+
+		virtualItem->_BuyPrice = FMath::Clamp(exactItem._BuyPrice, -1, exactItem._BuyPrice);
+
+		virtualItem->_SellPrice = FMath::Clamp(exactItem._SellPrice, -1, exactItem._SellPrice);
+
+		virtualItem->_ItemWeight = FMath::Clamp(exactItem._ItemWeight, 1, exactItem._ItemWeight);
 	}
 }
+
 FString FClothingItem::MakeString()
 {
 	FString ret;
@@ -954,4 +924,59 @@ FString UItemBase::ClassMember(FString name, int classMemberTabs, TMap<UItemBase
 	}
 	ret += ClosedBracketSemiColon() + NewLine();
 	return ret;
+}
+
+FContainerItem::FContainerItem(FString rowName)
+{
+	_RowName = rowName;
+	_BuyPrice = 2350;
+	_Percentge = 1.1f;
+	if (rowName.Contains("Small"))
+	{
+		_ContainerSize = 10;
+		_ItemWeight = 5;
+	}
+
+	if (rowName.Contains("Medium"))
+	{
+		_ContainerSize = 30;
+		_ItemWeight = 10;
+		_BuyPrice *= 2;
+	}
+
+	if (rowName.Contains("Large"))
+	{
+		_ContainerSize = 50;
+		_ItemWeight = 15;
+		_BuyPrice *= 2;
+	}
+
+	if (rowName.Contains("ExtraLarge"))
+	{
+		_ContainerSize = 70;
+		_ItemWeight = 20;
+		_BuyPrice *= 2;
+	}
+
+	if (rowName.Contains("Extreme"))
+	{
+		_ContainerSize = 100;
+		_ItemWeight = 25;
+		_BuyPrice *= 2;
+	}
+
+	if (rowName.Contains("Concealed"))
+	{
+		_Percentge = 1.3f;
+		_BuyPrice *= 3;
+	}
+
+	if (rowName.Contains("Refrigerated"))
+	{
+		_BuyPrice *= 2;
+		_Percentge = 1.5f;
+	}
+
+	_ContainerSize = FMath::Clamp(_ContainerSize, 1, _ContainerSize);
+	_ItemWeight = FMath::Clamp(_ItemWeight, 1, _ItemWeight);
 }
